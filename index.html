@@ -60,17 +60,17 @@
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
     }
-    button, a {
-      touch-action: manipulation;
-    }
-  </style>
-</head>
-<body class="font-sans antialiased min-h-screen flex flex-col pb-8 select-none">
-
-  <!-- TOP ESPN TICKER BAR -->
-  <div class="bg-black border-b border-espn-border text-sm flex items-center h-12 overflow-hidden sticky top-0 z-50">
-    <div class="bg-espn-red text-white font-black px-3.5 py-2.5 flex items-center gap-1.5 uppercase tracking-wider z-10 shrink-0 shadow-lg text-xs">
-      <i data-lucide="zap" class="w-4 h-4 fill-current"></i> BYB
+    <!-- HORIZONTAL MOBILE NAVIGATION CAROUSEL (Slightly Smaller Touch Buttons) -->
+    <div class="lg:hidden bg-black/95 border-b border-espn-border px-2.5 py-2 overflow-x-auto flex space-x-1.5 custom-scrollbar font-bold uppercase text-[11px] tracking-wider">
+      <button onclick="switchTab('dashboard')" id="m-nav-dashboard" class="m-nav-btn px-3 py-1.5 rounded-lg bg-espn-card shrink-0 text-white border border-espn-border shadow">Dashboard</button>
+      <button onclick="switchTab('schedule')" id="m-nav-schedule" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-300 shrink-0 border border-espn-border">Schedule</button>
+      <button onclick="switchTab('standings')" id="m-nav-standings" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-300 shrink-0 border border-espn-border">Standings</button>
+      <button onclick="switchTab('teams')" id="m-nav-teams" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-300 shrink-0 border border-espn-border">Teams</button>
+      <button onclick="switchTab('stats')" id="m-nav-stats" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-300 shrink-0 border border-espn-border">Stats</button>
+      <button onclick="switchTab('playoffs')" id="m-nav-playoffs" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-300 shrink-0 border border-espn-border">Playoffs</button>
+      <button onclick="switchTab('news')" id="m-nav-news" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-300 shrink-0 border border-espn-border">News</button>
+      <button onclick="switchTab('chat')" id="m-nav-chat" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-espn-red shrink-0 border border-espn-border">Chat</button>
+      <button onclick="switchTab('hof')" id="m-nav-hof" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-espn-gold shrink-0 border border-espn-border">HOF</button>
     </div>
     <div id="tickerContent" class="ticker-scroll custom-scrollbar flex items-center space-x-6 px-4 py-1.5 w-full text-gray-200 text-sm font-semibold">
       <!-- Dynamic Ticker Games Rendered via JS -->
@@ -619,7 +619,7 @@
     }
 
     function isAdmin() {
-      return currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      return currentUser && currentUser.email && currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
     }
 
     window.onload = function() {
@@ -641,7 +641,7 @@
       renderChat();
       renderHof();
     }
-
+    
     function renderTicker() {
       const ticker = document.getElementById('tickerContent');
       ticker.innerHTML = appData.games.map(g => {
@@ -1192,11 +1192,3 @@
   </script>
 </body>
 </html>
-```
-
-### What was updated for mobile visibility:
-1. **Bigger Base Font & Text Sizes:** Increased fonts across headlines, table stats, power rankings, and player names so they are sharp and readable without zooming.
-2. **Expanded Touch Targets & Padding:** Buttons, navigation pills, inputs, and card padding are larger so they are comfortable to tap with your thumb.
-3. **Enhanced Contrast & Spacing:** Increased table padding, border spacing, and ticker sizes for high visibility on phone displays.
-
-Copy the code above, edit your `index.html` file on GitHub, replace everything, and click **Commit changes**!
