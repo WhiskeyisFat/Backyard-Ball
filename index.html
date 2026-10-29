@@ -41,11 +41,11 @@
       color: #f3f4f6;
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
-      font-size: 16px; /* Base size scaled up for mobile legibility */
+      font-size: 16px;
     }
     .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
+      height: 4px;
+      width: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #121212;
@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <!-- HORIZONTAL MOBILE NAVIGATION CAROUSEL (Big Mobile Touch Buttons) -->
+    <!-- HORIZONTAL MOBILE NAVIGATION CAROUSEL -->
     <div class="lg:hidden bg-black/95 border-b border-espn-border px-3 py-2.5 overflow-x-auto flex space-x-2 custom-scrollbar font-extrabold uppercase text-xs tracking-wider">
       <button onclick="switchTab('dashboard')" id="m-nav-dashboard" class="m-nav-btn px-4 py-2.5 rounded-xl bg-espn-card shrink-0 text-white border border-espn-border shadow">Dashboard</button>
       <button onclick="switchTab('schedule')" id="m-nav-schedule" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-gray-300 shrink-0 border border-espn-border">Schedule</button>
@@ -143,18 +143,18 @@
       <span class="bg-black text-espn-gold px-2 py-1 rounded text-xs uppercase font-black tracking-wider">COMMISH</span>
       <span class="text-xs sm:text-sm">Logged in as hpillon77@gmail.com</span>
     </div>
-    <button onclick="openAdminModal('general')" class="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-200 transition shadow w-full sm:w-auto text-center">
-      <i data-lucide="settings" class="w-4 h-4 inline mr-1"></i> Admin Dashboard
-    </button>
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+      <button onclick="openAdminModal('general')" class="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-200 transition shadow flex-grow sm:flex-grow-0 text-center">
+        <i data-lucide="settings" class="w-4 h-4 inline mr-1"></i> Admin Menu
+      </button>
+    </div>
   </div>
 
   <!-- MAIN CONTENT CONTAINER -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
 
-    <!-- TAB 1: DASHBOARD / HOME -->
+    <!-- TAB 1: DASHBOARD -->
     <div id="tab-dashboard" class="tab-content space-y-5">
-      
-      <!-- HERO BANNER / FEATURED NEWS -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div class="lg:col-span-2 bg-espn-card rounded-2xl overflow-hidden border border-espn-border shadow-xl relative">
           <div class="h-64 sm:h-96 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=1200&q=80');">
@@ -174,7 +174,6 @@
           </div>
         </div>
 
-        <!-- QUICK POWER RANKINGS CARD -->
         <div class="bg-espn-card rounded-2xl border border-espn-border p-5 flex flex-col justify-between shadow-xl">
           <div>
             <div class="flex items-center justify-between pb-3 border-b border-espn-border mb-3">
@@ -183,9 +182,7 @@
               </h3>
               <span class="text-xs text-gray-400 font-bold">WEEK 5</span>
             </div>
-            <div id="dashPowerRankings" class="space-y-2.5">
-              <!-- Rendered via JS -->
-            </div>
+            <div id="dashPowerRankings" class="space-y-2.5"></div>
           </div>
           <button onclick="switchTab('news')" class="mt-4 text-sm font-extrabold text-espn-red hover:underline uppercase text-center block w-full py-1">
             View Rankings &rarr;
@@ -193,10 +190,7 @@
         </div>
       </div>
 
-      <!-- MID DASHBOARD: STANDINGS + STAT LEADERS -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        
-        <!-- QUICK STANDINGS -->
         <div class="bg-espn-card rounded-2xl border border-espn-border p-4 sm:p-5 shadow-xl">
           <div class="flex items-center justify-between pb-3 border-b border-espn-border mb-3">
             <h3 class="font-display font-black text-lg text-white flex items-center gap-2">
@@ -215,14 +209,11 @@
                   <th class="pb-2.5 text-center">DIFF</th>
                 </tr>
               </thead>
-              <tbody id="dashStandingsBody" class="divide-y divide-espn-border/50">
-                <!-- JS Rendered -->
-              </tbody>
+              <tbody id="dashStandingsBody" class="divide-y divide-espn-border/50"></tbody>
             </table>
           </div>
         </div>
 
-        <!-- STATS HIGHLIGHT: TD & INT LEADERS -->
         <div class="bg-espn-card rounded-2xl border border-espn-border p-4 sm:p-5 shadow-xl">
           <div class="flex items-center justify-between pb-3 border-b border-espn-border mb-3">
             <h3 class="font-display font-black text-lg text-white flex items-center gap-2">
@@ -231,28 +222,20 @@
             <button onclick="switchTab('stats')" class="text-xs font-bold text-espn-red hover:underline uppercase">All Stats</button>
           </div>
           <div class="grid grid-cols-2 gap-3 sm:gap-4">
-            <!-- TD Leaders -->
             <div class="bg-black/60 p-3 rounded-xl border border-espn-border">
               <p class="text-xs font-extrabold uppercase text-espn-gold mb-2">Touchdowns (TD)</p>
-              <div id="dashTdLeaders" class="space-y-2 text-xs sm:text-sm">
-                <!-- JS Rendered -->
-              </div>
+              <div id="dashTdLeaders" class="space-y-2 text-xs sm:text-sm"></div>
             </div>
-            <!-- INT Leaders -->
             <div class="bg-black/60 p-3 rounded-xl border border-espn-border">
               <p class="text-xs font-extrabold uppercase text-espn-red mb-2">Interceptions (INT)</p>
-              <div id="dashIntLeaders" class="space-y-2 text-xs sm:text-sm">
-                <!-- JS Rendered -->
-              </div>
+              <div id="dashIntLeaders" class="space-y-2 text-xs sm:text-sm"></div>
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
 
-    <!-- TAB 2: SCHEDULE & SCORES -->
+    <!-- TAB 2: SCHEDULE -->
     <div id="tab-schedule" class="tab-content hidden space-y-5">
       <div class="flex items-center justify-between gap-3 bg-espn-card p-4 rounded-2xl border border-espn-border shadow-lg">
         <div>
@@ -263,10 +246,7 @@
           + Add Game
         </button>
       </div>
-
-      <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- JS Rendered Game Cards -->
-      </div>
+      <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
     <!-- TAB 3: STANDINGS -->
@@ -276,11 +256,7 @@
           <h2 class="font-display font-black text-xl sm:text-2xl text-white">LEAGUE STANDINGS</h2>
           <p class="text-xs text-gray-400 mt-0.5">Official rankings updated weekly.</p>
         </div>
-        <button id="adminEditStandingsBtn" onclick="openAdminModal('editStandings')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-2 rounded-xl text-xs font-extrabold transition shrink-0 shadow">
-          Edit Standings
-        </button>
       </div>
-
       <div class="bg-espn-card rounded-2xl border border-espn-border overflow-hidden shadow-xl">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm sm:text-base whitespace-nowrap">
@@ -296,53 +272,44 @@
                 <th class="p-3.5 text-center">DIFF</th>
               </tr>
             </thead>
-            <tbody id="fullStandingsBody" class="divide-y divide-espn-border">
-              <!-- JS Rendered -->
-            </tbody>
+            <tbody id="fullStandingsBody" class="divide-y divide-espn-border"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4: TEAMS & ROSTERS -->
+    <!-- TAB 4: TEAMS -->
     <div id="tab-teams" class="tab-content hidden space-y-5">
       <div class="flex items-center justify-between gap-3 bg-espn-card p-4 rounded-2xl border border-espn-border shadow-lg">
         <div>
           <h2 class="font-display font-black text-xl sm:text-2xl text-white">TEAMS & ROSTERS</h2>
           <p class="text-xs text-gray-400 mt-0.5">Select a team below to view active roster.</p>
         </div>
+        <button id="adminAddPlayerBtn" onclick="openAdminModal('addPlayer')" class="hidden bg-espn-red text-white px-3 py-2 rounded-xl text-xs font-extrabold shadow">
+          + Add Player
+        </button>
       </div>
 
-      <!-- Team Selector Tabs -->
-      <div id="teamSelectorList" class="flex space-x-2.5 overflow-x-auto pb-1 custom-scrollbar">
-        <!-- JS Rendered Team Pills -->
-      </div>
-
-      <!-- Active Team Display -->
-      <div id="activeTeamView" class="space-y-4">
-        <!-- JS Rendered Team Card & Roster -->
-      </div>
+      <div id="teamSelectorList" class="flex space-x-2.5 overflow-x-auto pb-1 custom-scrollbar"></div>
+      <div id="activeTeamView" class="space-y-4"></div>
     </div>
 
-    <!-- TAB 5: PLAYER STATS -->
+    <!-- TAB 5: STATS -->
     <div id="tab-stats" class="tab-content hidden space-y-5">
       <div class="flex items-center justify-between gap-3 bg-espn-card p-4 rounded-2xl border border-espn-border shadow-lg">
         <div>
           <h2 class="font-display font-black text-xl sm:text-2xl text-white">PLAYER STATS</h2>
           <p class="text-xs text-gray-400 mt-0.5">Touchdowns, Interceptions & Sacks leaderboard.</p>
         </div>
-        <button id="adminEditStatsBtn" onclick="openAdminModal('editPlayerStats')" class="hidden bg-espn-red text-white px-3 py-2 rounded-xl text-xs font-extrabold shrink-0 shadow">
-          Edit Stats
-        </button>
       </div>
 
       <div class="bg-espn-card rounded-2xl border border-espn-border overflow-hidden shadow-xl">
         <div class="p-3.5 bg-black/60 border-b border-espn-border flex items-center justify-between text-xs sm:text-sm">
           <span class="text-gray-400 font-extrabold uppercase text-xs">Sort Category:</span>
           <div class="flex gap-2">
-            <button onclick="sortStatsBy('td')" class="stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-red text-white font-extrabold text-xs">TDs</button>
-            <button onclick="sortStatsBy('int')" class="stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-border text-gray-200 font-extrabold text-xs">INTs</button>
-            <button onclick="sortStatsBy('sacks')" class="stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-border text-gray-200 font-extrabold text-xs">Sacks</button>
+            <button onclick="sortStatsBy('td')" id="stat-btn-td" class="stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-red text-white font-extrabold text-xs transition">TDs</button>
+            <button onclick="sortStatsBy('int')" id="stat-btn-int" class="stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-border text-gray-400 font-extrabold text-xs transition">INTs</button>
+            <button onclick="sortStatsBy('sacks')" id="stat-btn-sacks" class="stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-border text-gray-400 font-extrabold text-xs transition">Sacks</button>
           </div>
         </div>
         <div class="overflow-x-auto">
@@ -355,9 +322,7 @@
                 <th class="p-3.5 text-center text-gray-300">Sacks</th>
               </tr>
             </thead>
-            <tbody id="playerStatsTableBody" class="divide-y divide-espn-border">
-              <!-- JS Rendered -->
-            </tbody>
+            <tbody id="playerStatsTableBody" class="divide-y divide-espn-border"></tbody>
           </table>
         </div>
       </div>
@@ -370,10 +335,12 @@
           <h2 class="font-display font-black text-xl sm:text-2xl text-white">PLAYOFF BRACKET</h2>
           <p class="text-xs text-gray-400 mt-0.5">Knee Bowl Championship tournament.</p>
         </div>
+        <button id="adminEditPlayoffsBtn" onclick="openAdminModal('editPlayoffs')" class="hidden bg-espn-red text-white px-3 py-2 rounded-xl text-xs font-extrabold shadow">
+          Edit Bracket
+        </button>
       </div>
 
       <div class="space-y-4">
-        <!-- Semifinals Card -->
         <div class="bg-espn-card p-5 rounded-2xl border border-espn-border space-y-4 shadow-xl">
           <h3 class="text-xs sm:text-sm font-black uppercase text-espn-red tracking-widest text-center">Semifinals</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -382,7 +349,6 @@
           </div>
         </div>
 
-        <!-- Championship Card -->
         <div class="bg-espn-card p-5 rounded-2xl border-2 border-espn-gold space-y-4 text-center shadow-2xl">
           <h3 class="text-xs sm:text-sm font-black uppercase text-espn-gold tracking-widest flex items-center justify-center gap-1.5">
             <i data-lucide="trophy" class="w-5 h-5"></i> Knee Bowl Championship
@@ -396,29 +362,27 @@
       </div>
     </div>
 
-    <!-- TAB 7: NEWS & RANKINGS -->
+    <!-- TAB 7: NEWS -->
     <div id="tab-news" class="tab-content hidden space-y-5">
-      <div class="bg-espn-card p-4 rounded-2xl border border-espn-border shadow-lg">
-        <h2 class="font-display font-black text-xl sm:text-2xl text-white">NEWS & POWER RANKINGS</h2>
+      <div class="flex items-center justify-between gap-3 bg-espn-card p-4 rounded-2xl border border-espn-border shadow-lg">
+        <div>
+          <h2 class="font-display font-black text-xl sm:text-2xl text-white">NEWS & RANKINGS</h2>
+        </div>
+        <button id="adminAddNewsBtn" onclick="openAdminModal('addNews')" class="hidden bg-espn-red text-white px-3 py-2 rounded-xl text-xs font-extrabold shadow">
+          + Add Article
+        </button>
       </div>
 
       <div class="space-y-5">
-        <div class="space-y-4" id="newsFeedContainer">
-          <!-- JS Rendered -->
-        </div>
-
+        <div class="space-y-4" id="newsFeedContainer"></div>
         <div class="bg-espn-card p-5 rounded-2xl border border-espn-border shadow-xl">
-          <h3 class="font-display font-black text-lg text-white border-b border-espn-border pb-3 mb-3">
-            POWER RANKINGS
-          </h3>
-          <div id="fullPowerRankingsList" class="space-y-2.5">
-            <!-- JS Rendered -->
-          </div>
+          <h3 class="font-display font-black text-lg text-white border-b border-espn-border pb-3 mb-3">POWER RANKINGS</h3>
+          <div id="fullPowerRankingsList" class="space-y-2.5"></div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 8: CHAT ROOM -->
+    <!-- TAB 8: CHAT -->
     <div id="tab-chat" class="tab-content hidden space-y-4">
       <div class="bg-espn-card p-4 rounded-2xl border border-espn-border shadow-lg">
         <h2 class="font-display font-black text-xl text-white flex items-center gap-2">
@@ -427,20 +391,14 @@
       </div>
 
       <div class="bg-espn-card border border-espn-border rounded-2xl shadow-2xl flex flex-col h-[500px] sm:h-[600px]">
-        <div id="chatMessages" class="flex-grow p-4 overflow-y-auto space-y-4 custom-scrollbar">
-          <!-- JS Rendered Messages -->
-        </div>
-
+        <div id="chatMessages" class="flex-grow p-4 overflow-y-auto space-y-4 custom-scrollbar"></div>
         <div class="p-3 bg-black border-t border-espn-border rounded-b-2xl">
           <div id="chatAuthPrompt" class="hidden text-center py-1.5 text-xs text-gray-400">
             <button onclick="openAuthModal()" class="text-espn-red font-bold underline">Sign in to participate in chat</button>
           </div>
-
           <form id="chatForm" onsubmit="sendChatMessage(event)" class="flex gap-2">
             <input type="text" id="chatInput" placeholder="Type a message..." class="flex-grow bg-espn-card border border-espn-border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-espn-red" required>
-            <button type="submit" class="bg-espn-red hover:bg-espn-darkRed text-white font-extrabold px-5 py-3 rounded-xl text-sm transition shrink-0 shadow">
-              Send
-            </button>
+            <button type="submit" class="bg-espn-red hover:bg-espn-darkRed text-white font-extrabold px-5 py-3 rounded-xl text-sm transition shrink-0 shadow">Send</button>
           </form>
         </div>
       </div>
@@ -448,33 +406,33 @@
 
     <!-- TAB 9: HALL OF FAME -->
     <div id="tab-hof" class="tab-content hidden space-y-5">
-      <div class="bg-gradient-to-r from-yellow-950 via-espn-card to-black p-5 rounded-2xl border border-espn-gold shadow-xl">
-        <h2 class="font-display font-black text-2xl text-white">HALL OF FAME</h2>
-        <p class="text-xs text-espn-gold font-bold mt-1">Honoring Knee Football Legends & Dynasties.</p>
+      <div class="flex items-center justify-between gap-3 bg-gradient-to-r from-yellow-950 via-espn-card to-black p-5 rounded-2xl border border-espn-gold shadow-xl">
+        <div>
+          <h2 class="font-display font-black text-2xl text-white">HALL OF FAME</h2>
+          <p class="text-xs text-espn-gold font-bold mt-1">Honoring Knee Football Legends & Dynasties.</p>
+        </div>
+        <button id="adminAddHofBtn" onclick="openAdminModal('addHof')" class="hidden bg-espn-gold text-black px-3 py-2 rounded-xl text-xs font-black shadow">
+          + Add HOF Entry
+        </button>
       </div>
 
       <div class="flex space-x-2 border-b border-espn-border pb-3 overflow-x-auto text-xs sm:text-sm">
-        <button onclick="filterHof('all')" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-gold text-black shrink-0">All</button>
-        <button onclick="filterHof('player')" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-200 shrink-0">Players</button>
-        <button onclick="filterHof('team')" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-200 shrink-0">Teams</button>
-        <button onclick="filterHof('award')" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-200 shrink-0">Awards</button>
+        <button onclick="filterHof('all')" id="hof-filter-all" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-gold text-black shrink-0 transition">All</button>
+        <button onclick="filterHof('player')" id="hof-filter-player" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Players</button>
+        <button onclick="filterHof('team')" id="hof-filter-team" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Teams</button>
+        <button onclick="filterHof('award')" id="hof-filter-award" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Awards</button>
       </div>
 
-      <div id="hofGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- JS Rendered -->
-      </div>
+      <div id="hofGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 
   </main>
 
-  <!-- ACCOUNT / AUTH MODAL -->
+  <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-espn-card border border-espn-border rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-        <i data-lucide="x" class="w-6 h-6"></i>
-      </button>
-      <h3 id="authModalTitle" class="font-display font-black text-xl text-white mb-1">SIGN IN / JOIN</h3>
-
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      <h3 class="font-display font-black text-xl text-white mb-1">SIGN IN / JOIN</h3>
       <form onsubmit="handleUserAuth(event)" class="space-y-4 mt-4">
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Your Name</label>
@@ -482,35 +440,28 @@
         </div>
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Email Address</label>
-          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. player@gmail.com">
+          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. hpillon77@gmail.com">
         </div>
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Password</label>
           <input type="password" id="authPassword" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="••••••••">
         </div>
-        <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow">
-          Sign In
-        </button>
+        <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow">Sign In</button>
       </form>
     </div>
   </div>
 
-  <!-- ADMIN MANAGEMENT MODAL -->
+  <!-- ADMIN MODAL -->
   <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-espn-card border border-espn-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative my-6">
-      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-        <i data-lucide="x" class="w-6 h-6"></i>
-      </button>
-      <div id="adminModalContent">
-        <!-- JS Rendered -->
-      </div>
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      <div id="adminModalContent"></div>
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
   <script>
-    const STORAGE_KEY = 'byb_knee_football_data_v1';
-    const USER_KEY = 'byb_current_user_v1';
+    const STORAGE_KEY = 'byb_knee_football_data_v2';
+    const USER_KEY = 'byb_current_user_v2';
     const ADMIN_EMAIL = 'hpillon77@gmail.com';
 
     const initialData = {
@@ -529,9 +480,7 @@
       games: [
         { id: 'g1', homeId: 't1', awayId: 't2', homeScore: 28, awayScore: 21, status: 'FINAL', date: 'Oct 12', field: 'Field 1' },
         { id: 'g2', homeId: 't3', awayId: 't4', homeScore: 18, awayScore: 12, status: 'FINAL', date: 'Oct 19', field: 'Field 2' },
-        { id: 'g3', homeId: 't1', awayId: 't3', homeScore: 32, awayScore: 14, status: 'FINAL', date: 'Oct 26', field: 'Field 1' },
-        { id: 'g4', homeId: 't2', awayId: 't4', homeScore: 24, awayScore: 18, status: 'LIVE', date: 'Nov 2', field: 'Field 2' },
-        { id: 'g5', homeId: 't4', awayId: 't1', homeScore: 0, awayScore: 0, status: 'UPCOMING', date: 'Nov 9', field: 'Field 1' }
+        { id: 'g3', homeId: 't1', awayId: 't3', homeScore: 32, awayScore: 14, status: 'FINAL', date: 'Oct 26', field: 'Field 1' }
       ],
       players: [
         { id: 'p1', teamId: 't1', number: '12', name: 'Hunter Pillon', pos: 'QB/DB', td: 14, int: 5, sacks: 3 },
@@ -576,6 +525,7 @@
     let currentTab = 'dashboard';
     let currentStatSort = 'td';
     let currentHofFilter = 'all';
+    let selectedTeamId = 't1';
 
     function loadData() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -596,6 +546,7 @@
       currentUser = user;
       localStorage.setItem(USER_KEY, JSON.stringify(user));
       renderUserHeader();
+      renderAdminElements();
       renderChat();
     }
 
@@ -628,14 +579,12 @@
       const target = document.getElementById('tab-' + tabId);
       if (target) target.classList.remove('hidden');
 
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('text-espn-red', 'bg-espn-card');
-      });
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-espn-red', 'bg-espn-card'));
       const activeNav = document.getElementById('nav-' + tabId);
       if (activeNav) activeNav.classList.add('text-espn-red', 'bg-espn-card');
 
       document.querySelectorAll('.m-nav-btn').forEach(btn => {
-        btn.classList.remove('bg-espn-card', 'text-white', 'text-espn-red');
+        btn.classList.remove('bg-espn-card', 'text-white', 'text-espn-red', 'text-espn-gold');
         btn.classList.add('bg-black', 'text-gray-300');
       });
       const activeMNav = document.getElementById('m-nav-' + tabId);
@@ -648,8 +597,7 @@
     }
 
     function toggleMobileMenu() {
-      const menu = document.getElementById('mobileMenu');
-      menu.classList.toggle('hidden');
+      document.getElementById('mobileMenu').classList.toggle('hidden');
     }
 
     function renderUserHeader() {
@@ -684,20 +632,14 @@
       }
     }
 
-    function openAuthModal() {
-      document.getElementById('authModal').classList.remove('hidden');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.add('hidden');
-    }
+    function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
 
     function handleUserAuth(e) {
       e.preventDefault();
       const username = document.getElementById('authUsername').value.trim();
       const email = document.getElementById('authEmail').value.trim();
       if (!username || !email) return;
-
       saveUser({ name: username, email: email, authenticated: true });
       closeAuthModal();
     }
@@ -718,14 +660,14 @@
         const diff = s.pf - s.pa;
         return `
           <tr class="hover:bg-espn-card">
-            <td class="py-3 flex items-center gap-2 font-extrabold text-white text-sm sm:text-base">
-              <span class="text-xl">${team ? team.logo : ''}</span>
+            <td class="py-3 flex items-center gap-2 font-extrabold text-white text-sm">
+              <span class="text-lg">${team ? team.logo : ''}</span>
               <span class="truncate">${team ? team.name : ''}</span>
             </td>
-            <td class="text-center font-bold text-gray-200 text-sm sm:text-base">${s.w}</td>
-            <td class="text-center font-bold text-gray-200 text-sm sm:text-base">${s.l}</td>
-            <td class="text-center font-black text-espn-gold text-sm sm:text-base">${pct}</td>
-            <td class="text-center font-mono font-bold text-sm sm:text-base ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
+            <td class="text-center font-bold text-gray-200 text-sm">${s.w}</td>
+            <td class="text-center font-bold text-gray-200 text-sm">${s.l}</td>
+            <td class="text-center font-black text-espn-gold text-sm">${pct}</td>
+            <td class="text-center font-mono font-bold text-sm ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
           </tr>
         `;
       }).join('');
@@ -738,9 +680,7 @@
           <div class="flex items-center justify-between p-2.5 bg-black/50 rounded-xl border border-espn-border">
             <div class="flex items-center gap-2.5">
               <span class="font-display font-black text-lg text-espn-red">#${pr.rank}</span>
-              <div>
-                <p class="font-extrabold text-white text-sm sm:text-base">${team ? team.name : ''}</p>
-              </div>
+              <p class="font-extrabold text-white text-sm">${team ? team.name : ''}</p>
             </div>
             <span class="text-xs font-bold text-gray-400">${pr.change}</span>
           </div>
@@ -749,7 +689,7 @@
 
       const tdLeaders = [...appData.players].sort((a, b) => b.td - a.td).slice(0, 3);
       document.getElementById('dashTdLeaders').innerHTML = tdLeaders.map(p => `
-        <div class="flex justify-between items-center text-xs sm:text-sm">
+        <div class="flex justify-between items-center text-xs">
           <span class="text-gray-200 font-bold truncate mr-1">${p.name}</span>
           <span class="font-black text-espn-gold shrink-0">${p.td} TD</span>
         </div>
@@ -757,7 +697,7 @@
 
       const intLeaders = [...appData.players].sort((a, b) => b.int - a.int).slice(0, 3);
       document.getElementById('dashIntLeaders').innerHTML = intLeaders.map(p => `
-        <div class="flex justify-between items-center text-xs sm:text-sm">
+        <div class="flex justify-between items-center text-xs">
           <span class="text-gray-200 font-bold truncate mr-1">${p.name}</span>
           <span class="font-black text-espn-red shrink-0">${p.int} INT</span>
         </div>
@@ -770,36 +710,30 @@
         const home = appData.teams.find(t => t.id === g.homeId);
         const away = appData.teams.find(t => t.id === g.awayId);
         return `
-          <div class="bg-espn-card border border-espn-border rounded-2xl p-5 shadow-xl">
-            <div class="flex justify-between items-center text-xs sm:text-sm text-gray-400 mb-3 pb-2 border-b border-espn-border">
+          <div class="bg-espn-card border border-espn-border rounded-2xl p-4 shadow-xl">
+            <div class="flex justify-between items-center text-xs text-gray-400 mb-2 pb-2 border-b border-espn-border">
               <span class="font-black text-espn-gold">${g.field}</span>
               <span class="font-bold">${g.date}</span>
             </div>
-            <div class="space-y-3">
+            <div class="space-y-2">
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <span class="text-2xl">${away ? away.logo : ''}</span>
-                  <span class="font-extrabold text-white text-base sm:text-lg">${away ? away.name : 'TBD'}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">${away ? away.logo : ''}</span>
+                  <span class="font-extrabold text-white text-sm sm:text-base">${away ? away.name : 'TBD'}</span>
                 </div>
-                <span class="text-2xl sm:text-3xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">
-                  ${g.status === 'UPCOMING' ? '-' : g.awayScore}
-                </span>
+                <span class="text-xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">${g.status === 'UPCOMING' ? '-' : g.awayScore}</span>
               </div>
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <span class="text-2xl">${home ? home.logo : ''}</span>
-                  <span class="font-extrabold text-white text-base sm:text-lg">${home ? home.name : 'TBD'}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">${home ? home.logo : ''}</span>
+                  <span class="font-extrabold text-white text-sm sm:text-base">${home ? home.name : 'TBD'}</span>
                 </div>
-                <span class="text-2xl sm:text-3xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">
-                  ${g.status === 'UPCOMING' ? '-' : g.homeScore}
-                </span>
+                <span class="text-xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">${g.status === 'UPCOMING' ? '-' : g.homeScore}</span>
               </div>
             </div>
-            <div class="mt-4 pt-3 border-t border-espn-border flex justify-between items-center">
-              <span class="text-xs uppercase font-black px-2.5 py-1 rounded-lg ${g.status === 'LIVE' ? 'bg-espn-red text-white animate-pulse' : 'bg-black text-gray-400'}">
-                ${g.status}
-              </span>
-              ${isAdmin() ? `<button onclick="editGameScore('${g.id}')" class="text-xs text-espn-red font-extrabold">Edit Score</button>` : ''}
+            <div class="mt-3 pt-2 border-t border-espn-border flex justify-between items-center">
+              <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded ${g.status === 'LIVE' ? 'bg-espn-red text-white animate-pulse' : 'bg-black text-gray-400'}">${g.status}</span>
+              ${isAdmin() ? `<button onclick="editGameScore('${g.id}')" class="text-xs text-espn-red font-extrabold hover:underline">Edit Score</button>` : ''}
             </div>
           </div>
         `;
@@ -816,29 +750,28 @@
         const diff = s.pf - s.pa;
         return `
           <tr class="hover:bg-black/30">
-            <td class="p-4 font-extrabold text-white flex items-center gap-2.5 text-base">
-              <span class="text-espn-gold font-black text-sm w-4">${idx + 1}</span>
-              <span class="text-xl">${team ? team.logo : ''}</span>
+            <td class="p-3 font-extrabold text-white flex items-center gap-2 text-sm">
+              <span class="text-espn-gold font-black text-xs w-4">${idx + 1}</span>
+              <span class="text-lg">${team ? team.logo : ''}</span>
               <span>${team ? team.name : ''}</span>
             </td>
-            <td class="p-4 text-center font-bold text-white text-base">${s.w}</td>
-            <td class="p-4 text-center font-bold text-white text-base">${s.l}</td>
-            <td class="p-4 text-center font-bold text-white text-base">${s.t}</td>
-            <td class="p-4 text-center font-black text-espn-gold text-base">${pct}</td>
-            <td class="p-4 text-center font-mono text-gray-300 text-base">${s.pf}</td>
-            <td class="p-4 text-center font-mono text-gray-300 text-base">${s.pa}</td>
-            <td class="p-4 text-center font-mono font-bold text-base ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
+            <td class="p-3 text-center font-bold text-white text-sm">${s.w}</td>
+            <td class="p-3 text-center font-bold text-white text-sm">${s.l}</td>
+            <td class="p-3 text-center font-bold text-white text-sm">${s.t}</td>
+            <td class="p-3 text-center font-black text-espn-gold text-sm">${pct}</td>
+            <td class="p-3 text-center font-mono text-gray-300 text-sm">${s.pf}</td>
+            <td class="p-3 text-center font-mono text-gray-300 text-sm">${s.pa}</td>
+            <td class="p-3 text-center font-mono font-bold text-sm ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
           </tr>
         `;
       }).join('');
     }
 
-    let selectedTeamId = 't1';
     function renderTeams() {
       const selector = document.getElementById('teamSelectorList');
       selector.innerHTML = appData.teams.map(t => `
-        <button onclick="selectTeam('${t.id}')" class="px-4 py-2.5 rounded-xl border text-sm font-extrabold transition flex items-center gap-2 shrink-0 ${selectedTeamId === t.id ? 'bg-espn-red text-white border-espn-red shadow-lg' : 'bg-espn-card text-gray-300 border-espn-border'}">
-          <span class="text-lg">${t.logo}</span>
+        <button onclick="selectTeam('${t.id}')" class="px-3.5 py-2 rounded-xl border text-xs sm:text-sm font-extrabold transition flex items-center gap-1.5 shrink-0 ${selectedTeamId === t.id ? 'bg-espn-red text-white border-espn-red shadow-lg' : 'bg-espn-card text-gray-300 border-espn-border'}">
+          <span class="text-base">${t.logo}</span>
           <span>${t.name}</span>
         </button>
       `).join('');
@@ -848,41 +781,44 @@
 
       const view = document.getElementById('activeTeamView');
       view.innerHTML = `
-        <div class="bg-espn-card border border-espn-border rounded-2xl p-5 shadow-xl flex items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <div class="text-4xl bg-black p-3 rounded-2xl border border-espn-border">${activeTeam.logo}</div>
+        <div class="bg-espn-card border border-espn-border rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl bg-black p-2.5 rounded-xl border border-espn-border">${activeTeam.logo}</div>
             <div>
-              <h3 class="font-display font-black text-2xl text-white">${activeTeam.name}</h3>
-              <p class="text-xs sm:text-sm text-espn-gold font-extrabold mt-0.5">RECORD: ${activeTeam.record}</p>
+              <h3 class="font-display font-black text-xl text-white">${activeTeam.name}</h3>
+              <p class="text-xs text-espn-gold font-extrabold mt-0.5">RECORD: ${activeTeam.record}</p>
             </div>
           </div>
+          ${isAdmin() ? `<button onclick="editTeam('${activeTeam.id}')" class="bg-black border border-espn-border text-xs text-gray-300 px-3 py-1.5 rounded-lg font-bold">Edit Team</button>` : ''}
         </div>
 
         <div class="bg-espn-card rounded-2xl border border-espn-border overflow-hidden shadow-xl">
-          <div class="p-4 bg-black/60 border-b border-espn-border font-extrabold text-xs uppercase text-gray-400 tracking-wider">
-            Roster (${teamPlayers.length} Players)
+          <div class="p-3 bg-black/60 border-b border-espn-border font-extrabold text-[11px] uppercase text-gray-400 tracking-wider">
+            Active Roster
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm sm:text-base">
-              <thead class="bg-black text-gray-400 text-xs uppercase font-extrabold border-b border-espn-border">
+            <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
+              <thead class="bg-black text-gray-400 text-[10px] uppercase font-extrabold border-b border-espn-border">
                 <tr>
-                  <th class="p-3.5">#</th>
-                  <th class="p-3.5">Name</th>
-                  <th class="p-3.5">Pos</th>
-                  <th class="p-3.5 text-center">TD</th>
-                  <th class="p-3.5 text-center">INT</th>
-                  <th class="p-3.5 text-center">Sacks</th>
+                  <th class="p-2.5 w-10">#</th>
+                  <th class="p-2.5">Player Name</th>
+                  <th class="p-2.5 w-16">Pos</th>
+                  <th class="p-2.5 text-center w-12">TD</th>
+                  <th class="p-2.5 text-center w-12">INT</th>
+                  <th class="p-2.5 text-center w-14">Sacks</th>
+                  ${isAdmin() ? '<th class="p-2.5 text-center w-16">Action</th>' : ''}
                 </tr>
               </thead>
               <tbody class="divide-y divide-espn-border">
                 ${teamPlayers.map(p => `
                   <tr>
-                    <td class="p-3.5 font-mono font-bold text-espn-red">#${p.number}</td>
-                    <td class="p-3.5 font-extrabold text-white">${p.name}</td>
-                    <td class="p-3.5 text-xs text-gray-400 font-bold">${p.pos}</td>
-                    <td class="p-3.5 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
-                    <td class="p-3.5 text-center font-black text-espn-red text-base">${p.int || 0}</td>
-                    <td class="p-3.5 text-center font-bold text-gray-200 text-base">${p.sacks || 0}</td>
+                    <td class="p-2.5 font-mono font-bold text-espn-red">#${p.number}</td>
+                    <td class="p-2.5 font-extrabold text-white truncate max-w-[110px]">${p.name}</td>
+                    <td class="p-2.5 text-[11px] text-gray-400 font-bold">${p.pos}</td>
+                    <td class="p-2.5 text-center font-black text-espn-gold">${p.td || 0}</td>
+                    <td class="p-2.5 text-center font-black text-espn-red">${p.int || 0}</td>
+                    <td class="p-2.5 text-center font-mono font-bold text-gray-200">${p.sacks || 0}</td>
+                    ${isAdmin() ? `<td class="p-2.5 text-center"><button onclick="editPlayer('${p.id}')" class="text-espn-red font-bold text-xs">Edit</button></td>` : ''}
                   </tr>
                 `).join('')}
               </tbody>
@@ -901,20 +837,31 @@
       const container = document.getElementById('playerStatsTableBody');
       const sorted = [...appData.players].sort((a, b) => (b[currentStatSort] || 0) - (a[currentStatSort] || 0));
 
+      ['td', 'int', 'sacks'].forEach(cat => {
+        const btn = document.getElementById('stat-btn-' + cat);
+        if (btn) {
+          if (currentStatSort === cat) {
+            btn.className = 'stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-red text-white font-extrabold text-xs transition shadow';
+          } else {
+            btn.className = 'stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-border text-gray-400 font-extrabold text-xs transition';
+          }
+        }
+      });
+
       container.innerHTML = sorted.map(p => {
         const team = appData.teams.find(t => t.id === p.teamId);
         return `
           <tr class="hover:bg-black/30">
-            <td class="p-3.5 font-extrabold text-white text-sm sm:text-base">
+            <td class="p-3 font-extrabold text-white text-sm">
               <div class="flex items-center gap-2">
-                <span class="text-espn-red font-mono text-sm">#${p.number}</span>
+                <span class="text-espn-red font-mono text-xs">#${p.number}</span>
                 <span>${p.name}</span>
               </div>
-              <span class="text-xs text-gray-400 font-semibold block">${team ? team.name : ''}</span>
+              <span class="text-[10px] text-gray-400 font-semibold block">${team ? team.name : ''}</span>
             </td>
-            <td class="p-3.5 text-center font-black text-espn-gold text-lg">${p.td || 0}</td>
-            <td class="p-3.5 text-center font-black text-espn-red text-lg">${p.int || 0}</td>
-            <td class="p-3.5 text-center font-mono font-bold text-gray-200 text-lg">${p.sacks || 0}</td>
+            <td class="p-3 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
+            <td class="p-3 text-center font-black text-espn-red text-base">${p.int || 0}</td>
+            <td class="p-3 text-center font-mono font-bold text-gray-200 text-base">${p.sacks || 0}</td>
           </tr>
         `;
       }).join('');
@@ -931,13 +878,13 @@
         const home = appData.teams.find(t => t.id === match.homeId);
         const away = appData.teams.find(t => t.id === match.awayId);
         return `
-          <div class="flex items-center justify-between text-sm sm:text-base ${match.winnerId === match.awayId ? 'font-black text-white' : 'text-gray-400'}">
+          <div class="flex items-center justify-between text-xs sm:text-sm ${match.winnerId === match.awayId ? 'font-black text-white' : 'text-gray-400'}">
             <span>${away ? away.name : 'TBD'}</span>
-            <span class="font-extrabold text-espn-gold text-base">${match.awayScore !== null ? match.awayScore : '-'}</span>
+            <span class="font-extrabold text-espn-gold">${match.awayScore !== null ? match.awayScore : '-'}</span>
           </div>
-          <div class="flex items-center justify-between text-sm sm:text-base ${match.winnerId === match.homeId ? 'font-black text-white' : 'text-gray-400'}">
+          <div class="flex items-center justify-between text-xs sm:text-sm ${match.winnerId === match.homeId ? 'font-black text-white' : 'text-gray-400'}">
             <span>${home ? home.name : 'TBD'}</span>
-            <span class="font-extrabold text-espn-gold text-base">${match.homeScore !== null ? match.homeScore : '-'}</span>
+            <span class="font-extrabold text-espn-gold">${match.homeScore !== null ? match.homeScore : '-'}</span>
           </div>
         `;
       };
@@ -953,12 +900,15 @@
     function renderNews() {
       const feed = document.getElementById('newsFeedContainer');
       feed.innerHTML = appData.news.map(item => `
-        <div class="bg-espn-card border border-espn-border rounded-2xl overflow-hidden shadow-xl p-4 flex flex-col sm:flex-row gap-4">
-          <img src="${item.image}" alt="${item.headline}" class="w-full sm:w-44 h-40 object-cover rounded-xl shrink-0">
-          <div>
-            <span class="text-xs font-black uppercase text-espn-red tracking-wider">${item.date}</span>
-            <h3 class="font-display font-black text-base sm:text-lg text-white mt-1">${item.headline}</h3>
-            <p class="text-xs sm:text-sm text-gray-300 mt-2 line-clamp-3">${item.content}</p>
+        <div class="bg-espn-card border border-espn-border rounded-2xl overflow-hidden shadow-xl p-4 flex flex-col sm:flex-row gap-4 relative">
+          <img src="${item.image}" alt="${item.headline}" class="w-full sm:w-40 h-36 object-cover rounded-xl shrink-0">
+          <div class="flex-grow">
+            <div class="flex justify-between items-start">
+              <span class="text-[10px] font-black uppercase text-espn-red tracking-wider">${item.date}</span>
+              ${isAdmin() ? `<button onclick="deleteNews('${item.id}')" class="text-xs text-red-400 font-bold">Delete</button>` : ''}
+            </div>
+            <h3 class="font-display font-black text-sm sm:text-base text-white mt-1">${item.headline}</h3>
+            <p class="text-xs text-gray-300 mt-1 line-clamp-3">${item.content}</p>
           </div>
         </div>
       `).join('');
@@ -967,14 +917,12 @@
       prList.innerHTML = appData.powerRankings.map(pr => {
         const team = appData.teams.find(t => t.id === pr.teamId);
         return `
-          <div class="p-3 bg-black/50 border border-espn-border rounded-xl flex items-center justify-between text-sm">
-            <div class="flex items-center gap-3">
-              <span class="font-display font-black text-lg text-espn-red">#${pr.rank}</span>
-              <div>
-                <p class="font-extrabold text-white text-base">${team ? team.name : ''}</p>
-              </div>
+          <div class="p-2.5 bg-black/50 border border-espn-border rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-display font-black text-base text-espn-red">#${pr.rank}</span>
+              <p class="font-extrabold text-white text-sm">${team ? team.name : ''}</p>
             </div>
-            <span class="text-xs font-bold text-espn-gold">${pr.change}</span>
+            <span class="text-[11px] font-bold text-espn-gold">${pr.change}</span>
           </div>
         `;
       }).join('');
@@ -996,21 +944,20 @@
       container.innerHTML = appData.chat.map(msg => {
         const isCommish = msg.user.toLowerCase() === ADMIN_EMAIL.toLowerCase();
         return `
-          <div class="flex items-start gap-2.5">
-            <div class="w-8 h-8 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-xs text-white shrink-0 shadow">
+          <div class="flex items-start gap-2">
+            <div class="w-7 h-7 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-xs text-white shrink-0 shadow">
               ${msg.name.charAt(0).toUpperCase()}
             </div>
-            <div class="bg-black/60 border border-espn-border rounded-2xl p-3 max-w-sm">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="font-extrabold text-xs sm:text-sm text-white">${msg.name}</span>
-                ${isCommish ? '<span class="bg-espn-red text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase">COMMISH</span>' : ''}
+            <div class="bg-black/60 border border-espn-border rounded-xl p-2.5 max-w-xs sm:max-w-md">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="font-extrabold text-xs text-white">${msg.name}</span>
+                ${isCommish ? '<span class="bg-espn-red text-white text-[8px] font-black px-1 py-0.2 rounded uppercase">COMMISH</span>' : ''}
               </div>
-              <p class="text-xs sm:text-sm text-gray-200">${msg.text}</p>
+              <p class="text-xs text-gray-200">${msg.text}</p>
             </div>
           </div>
         `;
       }).join('');
-
       container.scrollTop = container.scrollHeight;
     }
 
@@ -1020,32 +967,41 @@
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
       if (!text) return;
-
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
       appData.chat.push({
         id: 'c_' + Date.now(),
         user: currentUser.email,
         name: currentUser.name,
         text: text,
-        timestamp: timeStr
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
-
       input.value = '';
       saveData();
     }
 
     function renderHof() {
       const container = document.getElementById('hofGridContainer');
-      const filtered = appData.hof.filter(h => currentHofFilter === 'all' || h.type === currentHofFilter);
+      
+      ['all', 'player', 'team', 'award'].forEach(type => {
+        const btn = document.getElementById('hof-filter-' + type);
+        if (btn) {
+          if (currentHofFilter === type) {
+            btn.className = 'hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-gold text-black shrink-0 transition shadow';
+          } else {
+            btn.className = 'hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition';
+          }
+        }
+      });
 
+      const filtered = appData.hof.filter(h => currentHofFilter === 'all' || h.type === currentHofFilter);
       container.innerHTML = filtered.map(item => `
-        <div class="bg-gradient-to-b from-espn-card to-black border border-espn-gold/40 rounded-2xl p-5 shadow-xl relative">
-          <span class="text-espn-gold text-xs font-black uppercase tracking-wider block mb-1">${item.type.toUpperCase()}</span>
-          <h3 class="font-display font-black text-lg text-white">${item.name}</h3>
-          <p class="text-xs sm:text-sm font-extrabold text-espn-gold mt-1">${item.title}</p>
-          <p class="text-xs sm:text-sm text-gray-300 mt-2">${item.desc}</p>
+        <div class="bg-gradient-to-b from-espn-card to-black border border-espn-gold/40 rounded-2xl p-4 shadow-xl relative">
+          <div class="flex justify-between items-start">
+            <span class="text-espn-gold text-[10px] font-black uppercase tracking-wider">${item.type.toUpperCase()} • ${item.year}</span>
+            ${isAdmin() ? `<button onclick="deleteHof('${item.id}')" class="text-xs text-red-400 font-bold">Delete</button>` : ''}
+          </div>
+          <h3 class="font-display font-black text-base text-white mt-1">${item.name}</h3>
+          <p class="text-xs font-extrabold text-espn-gold mt-0.5">${item.title}</p>
+          <p class="text-xs text-gray-300 mt-2">${item.desc}</p>
         </div>
       `).join('');
     }
@@ -1055,83 +1011,218 @@
       renderHof();
     }
 
+    // ADMIN MODAL ACTIONS
     function openAdminModal(action) {
       if (!isAdmin()) return;
       const modal = document.getElementById('adminModal');
       const content = document.getElementById('adminModalContent');
       modal.classList.remove('hidden');
 
-      if (action === 'addGame') {
+      if (action === 'general') {
         content.innerHTML = `
-          <h3 class="font-display font-black text-lg text-white mb-4">ADD GAME</h3>
-          <form onsubmit="saveNewGame(event)" class="space-y-4 text-xs sm:text-sm">
+          <h3 class="font-display font-black text-lg text-white mb-3">COMMISSIONER CONTROLS</h3>
+          <div class="space-y-2.5 text-xs">
+            <button onclick="openAdminModal('addGame'); closeAdminModal(); openAdminModal('addGame');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Game</button>
+            <button onclick="openAdminModal('addPlayer'); closeAdminModal(); openAdminModal('addPlayer');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Player to Team</button>
+            <button onclick="openAdminModal('addNews'); closeAdminModal(); openAdminModal('addNews');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Publish News Article</button>
+            <button onclick="openAdminModal('addHof'); closeAdminModal(); openAdminModal('addHof');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-espn-gold">+ Add Hall of Fame Entry</button>
+            <button onclick="openAdminModal('editPlayoffs'); closeAdminModal(); openAdminModal('editPlayoffs');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">Update Playoff Bracket</button>
+          </div>
+        `;
+      } else if (action === 'addGame') {
+        content.innerHTML = `
+          <h3 class="font-display font-black text-lg text-white mb-3">ADD GAME</h3>
+          <form onsubmit="saveNewGame(event)" class="space-y-3 text-xs">
             <div>
               <label class="block font-bold text-gray-300 mb-1">Away Team</label>
-              <select id="admAway" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white" required>
+              <select id="admAway" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
                 ${appData.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
               </select>
             </div>
             <div>
               <label class="block font-bold text-gray-300 mb-1">Home Team</label>
-              <select id="admHome" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white" required>
+              <select id="admHome" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
                 ${appData.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
               </select>
             </div>
             <div>
               <label class="block font-bold text-gray-300 mb-1">Field</label>
-              <input type="text" id="admField" value="Field 1" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white" required>
+              <input type="text" id="admField" value="Field 1" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
             </div>
             <div>
               <label class="block font-bold text-gray-300 mb-1">Date</label>
-              <input type="text" id="admDate" value="Nov 16" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white" required>
+              <input type="text" id="admDate" value="Nov 16" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
             </div>
             <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl">Save Game</button>
+          </form>
+        `;
+      } else if (action === 'addPlayer') {
+        content.innerHTML = `
+          <h3 class="font-display font-black text-lg text-white mb-3">ADD PLAYER</h3>
+          <form onsubmit="saveNewPlayer(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Team</label>
+              <select id="admPlayerTeam" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
+                ${appData.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Player Name</label>
+              <input type="text" id="admPlayerName" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required placeholder="e.g. John Doe">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-bold text-gray-300 mb-1">Number</label>
+                <input type="text" id="admPlayerNum" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required placeholder="12">
+              </div>
+              <div>
+                <label class="block font-bold text-gray-300 mb-1">Position</label>
+                <input type="text" id="admPlayerPos" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required placeholder="QB/DB">
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div><label class="block text-gray-400 mb-1">TD</label><input type="number" id="admPlayerTd" value="0" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
+              <div><label class="block text-gray-400 mb-1">INT</label><input type="number" id="admPlayerInt" value="0" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
+              <div><label class="block text-gray-400 mb-1">Sacks</label><input type="number" id="admPlayerSacks" value="0" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
+            </div>
+            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl mt-2">Add Player</button>
+          </form>
+        `;
+      } else if (action === 'addNews') {
+        content.innerHTML = `
+          <h3 class="font-display font-black text-lg text-white mb-3">PUBLISH NEWS</h3>
+          <form onsubmit="saveNewNews(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Headline</label>
+              <input type="text" id="admNewsHeadline" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Date</label>
+              <input type="text" id="admNewsDate" value="Oct 28" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Content</label>
+              <textarea id="admNewsContent" rows="3" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></textarea>
+            </div>
+            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl">Publish Article</button>
+          </form>
+        `;
+      } else if (action === 'addHof') {
+        content.innerHTML = `
+          <h3 class="font-display font-black text-lg text-white mb-3">ADD HALL OF FAME ENTRY</h3>
+          <form onsubmit="saveNewHof(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Category Type</label>
+              <select id="admHofType" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
+                <option value="player">Player</option>
+                <option value="team">Team</option>
+                <option value="award">Award</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Name</label>
+              <input type="text" id="admHofName" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required placeholder="e.g. Hunter Pillon">
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Title / Achievement</label>
+              <input type="text" id="admHofTitle" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required placeholder="All-Time TD Leader">
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Year</label>
+              <input type="text" id="admHofYear" value="2025" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+            </div>
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">Description</label>
+              <textarea id="admHofDesc" rows="2" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></textarea>
+            </div>
+            <button type="submit" class="w-full bg-espn-gold text-black font-black py-3 rounded-xl">Add to HOF</button>
+          </form>
+        `;
+      } else if (action === 'editPlayoffs') {
+        content.innerHTML = `
+          <h3 class="font-display font-black text-lg text-white mb-3">UPDATE CHAMPION</h3>
+          <form onsubmit="savePlayoffChampion(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">League Champion Team</label>
+              <select id="admChampTeam" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
+                <option value="">TBD (No Winner Yet)</option>
+                ${appData.teams.map(t => `<option value="${t.id}" ${appData.playoffs.championship.winnerId === t.id ? 'selected' : ''}>${t.name}</option>`).join('')}
+              </select>
+            </div>
+            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl">Update Champion</button>
           </form>
         `;
       }
     }
 
-    function closeAdminModal() {
-      document.getElementById('adminModal').classList.add('hidden');
-    }
+    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
 
     function editGameScore(gameId) {
-      const game = appData.games.find(g => g.id === gameId);
-      if (!game) return;
-
+      const g = appData.games.find(x => x.id === gameId);
+      if (!g) return;
       openAdminModal('general');
-      const content = document.getElementById('adminModalContent');
-      content.innerHTML = `
-        <h3 class="font-display font-black text-lg text-white mb-4">UPDATE SCORE</h3>
-        <form onsubmit="saveGameScore(event, '${game.id}')" class="space-y-4 text-xs sm:text-sm">
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Away Score</label>
-            <input type="number" id="editAwayScore" value="${game.awayScore}" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white" required>
-          </div>
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Home Score</label>
-            <input type="number" id="editHomeScore" value="${game.homeScore}" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white" required>
-          </div>
+      document.getElementById('adminModalContent').innerHTML = `
+        <h3 class="font-display font-black text-lg text-white mb-3">UPDATE SCORE</h3>
+        <form onsubmit="saveGameScore(event, '${g.id}')" class="space-y-3 text-xs">
+          <div><label class="block font-bold text-gray-300 mb-1">Away Score</label><input type="number" id="editAway" value="${g.awayScore}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          <div><label class="block font-bold text-gray-300 mb-1">Home Score</label><input type="number" id="editHome" value="${g.homeScore}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
           <div>
             <label class="block font-bold text-gray-300 mb-1">Status</label>
-            <select id="editStatus" class="w-full bg-black border border-espn-border p-3 rounded-xl text-white">
-              <option value="UPCOMING" ${game.status === 'UPCOMING' ? 'selected' : ''}>UPCOMING</option>
-              <option value="LIVE" ${game.status === 'LIVE' ? 'selected' : ''}>LIVE</option>
-              <option value="FINAL" ${game.status === 'FINAL' ? 'selected' : ''}>FINAL</option>
+            <select id="editStatus" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
+              <option value="UPCOMING" ${g.status==='UPCOMING'?'selected':''}>UPCOMING</option>
+              <option value="LIVE" ${g.status==='LIVE'?'selected':''}>LIVE</option>
+              <option value="FINAL" ${g.status==='FINAL'?'selected':''}>FINAL</option>
             </select>
           </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl">Save Changes</button>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl">Save Score</button>
         </form>
       `;
     }
 
-    function saveGameScore(e, gameId) {
+    function saveGameScore(e, id) {
       e.preventDefault();
-      const game = appData.games.find(g => g.id === gameId);
-      if (game) {
-        game.awayScore = parseInt(document.getElementById('editAwayScore').value) || 0;
-        game.homeScore = parseInt(document.getElementById('editHomeScore').value) || 0;
-        game.status = document.getElementById('editStatus').value;
+      const g = appData.games.find(x => x.id === id);
+      if (g) {
+        g.awayScore = parseInt(document.getElementById('editAway').value) || 0;
+        g.homeScore = parseInt(document.getElementById('editHome').value) || 0;
+        g.status = document.getElementById('editStatus').value;
+        saveData();
+        closeAdminModal();
+      }
+    }
+
+    function editPlayer(playerId) {
+      const p = appData.players.find(x => x.id === playerId);
+      if (!p) return;
+      openAdminModal('general');
+      document.getElementById('adminModalContent').innerHTML = `
+        <h3 class="font-display font-black text-lg text-white mb-3">EDIT PLAYER STATS</h3>
+        <form onsubmit="savePlayerStats(event, '${p.id}')" class="space-y-3 text-xs">
+          <div><label class="block font-bold text-gray-300 mb-1">Player Name</label><input type="text" id="editPName" value="${p.name}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-bold text-gray-300 mb-1">#</label><input type="text" id="editPNum" value="${p.number}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+            <div><label class="block font-bold text-gray-300 mb-1">Pos</label><input type="text" id="editPPos" value="${p.pos}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div><label class="block text-gray-400 mb-1">TD</label><input type="number" id="editPTd" value="${p.td || 0}" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
+            <div><label class="block text-gray-400 mb-1">INT</label><input type="number" id="editPInt" value="${p.int || 0}" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
+            <div><label class="block text-gray-400 mb-1">Sacks</label><input type="number" id="editPSacks" value="${p.sacks || 0}" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
+          </div>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl mt-2">Save Player</button>
+        </form>
+      `;
+    }
+
+    function savePlayerStats(e, id) {
+      e.preventDefault();
+      const p = appData.players.find(x => x.id === id);
+      if (p) {
+        p.name = document.getElementById('editPName').value;
+        p.number = document.getElementById('editPNum').value;
+        p.pos = document.getElementById('editPPos').value;
+        p.td = parseInt(document.getElementById('editPTd').value) || 0;
+        p.int = parseInt(document.getElementById('editPInt').value) || 0;
+        p.sacks = parseInt(document.getElementById('editPSacks').value) || 0;
         saveData();
         closeAdminModal();
       }
@@ -1149,6 +1240,66 @@
         homeScore: 0,
         status: 'UPCOMING'
       });
+      saveData();
+      closeAdminModal();
+    }
+
+    function saveNewPlayer(e) {
+      e.preventDefault();
+      appData.players.push({
+        id: 'p_' + Date.now(),
+        teamId: document.getElementById('admPlayerTeam').value,
+        name: document.getElementById('admPlayerName').value,
+        number: document.getElementById('admPlayerNum').value,
+        pos: document.getElementById('admPlayerPos').value,
+        td: parseInt(document.getElementById('admPlayerTd').value) || 0,
+        int: parseInt(document.getElementById('admPlayerInt').value) || 0,
+        sacks: parseInt(document.getElementById('admPlayerSacks').value) || 0
+      });
+      saveData();
+      closeAdminModal();
+    }
+
+    function saveNewNews(e) {
+      e.preventDefault();
+      appData.news.unshift({
+        id: 'n_' + Date.now(),
+        headline: document.getElementById('admNewsHeadline').value,
+        date: document.getElementById('admNewsDate').value,
+        image: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=600&q=80',
+        content: document.getElementById('admNewsContent').value
+      });
+      saveData();
+      closeAdminModal();
+    }
+
+    function deleteNews(id) {
+      appData.news = appData.news.filter(n => n.id !== id);
+      saveData();
+    }
+
+    function saveNewHof(e) {
+      e.preventDefault();
+      appData.hof.push({
+        id: 'h_' + Date.now(),
+        type: document.getElementById('admHofType').value,
+        name: document.getElementById('admHofName').value,
+        title: document.getElementById('admHofTitle').value,
+        year: document.getElementById('admHofYear').value,
+        desc: document.getElementById('admHofDesc').value
+      });
+      saveData();
+      closeAdminModal();
+    }
+
+    function deleteHof(id) {
+      appData.hof = appData.hof.filter(h => h.id !== id);
+      saveData();
+    }
+
+    function savePlayoffChampion(e) {
+      e.preventDefault();
+      appData.playoffs.championship.winnerId = document.getElementById('admChampTeam').value || null;
       saveData();
       closeAdminModal();
     }
