@@ -11,6 +11,10 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Google Fonts: Inter & Montserrat -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs (Compat / Global Build to prevent module import errors) -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -454,10 +458,10 @@
 
   <!-- APP LOGIC -->
   <script>
-    const STORAGE_DATA_KEY = 'byb_permanent_league_data_v2';
+    const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'backyard-ball-league-v2';
+    const ADMIN_EMAIL = 'hpillon77@gmail.com';
     const USERS_DB_KEY = 'byb_registered_users_db';
     const CURRENT_USER_KEY = 'byb_active_user_session';
-    const ADMIN_EMAIL = 'hpillon77@gmail.com';
 
     const defaultAppData = {
       headline: {
@@ -520,38 +524,83 @@
       ]
     };
 
-    window.appData = loadStoredData();
+    window.appData = JSON.parse(JSON.stringify(defaultAppData));
     window.currentUser = loadUserSession();
     window.currentTab = 'dashboard';
     window.currentStatSort = 'td';
     window.currentHofFilter = 'all';
     window.selectedTeamId = 't1';
 
-    function loadStoredData() {
+    let db, auth, firebaseUser = null;
+
+    async function initFirebase() {
       try {
-        const saved = localStorage.getItem(STORAGE_DATA_KEY);
-        if (saved) {
-          return JSON.parse(saved);
+        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+          const firebaseConfig = JSON.parse(__firebase_config);
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          db = firebase.firestore();
+          auth = firebase.auth();
+
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await auth.signInWithCustomToken(__initial_auth_token);
+          } else {
+            await auth.signInAnonymously();
+          }
+
+          auth.onAuthStateChanged((user) => {
+            firebaseUser = user;
+            if (user && db) {
+              setupCloudSync();
+            }
+          });
         }
       } catch (e) {
-        console.warn("Could not load from localStorage:", e);
+        console.warn("Firebase init offline mode fallback:", e);
       }
-      return JSON.parse(JSON.stringify(defaultAppData));
     }
 
-    window.savePermanentChanges = function() {
+    function setupCloudSync() {
       try {
-        localStorage.setItem(STORAGE_DATA_KEY, JSON.stringify(window.appData));
-        showToast("Changes permanently saved to website!");
+        const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection('league_state').doc('current');
+        docRef.onSnapshot((docSnap) => {
+          if (docSnap.exists) {
+            const cloudData = docSnap.data();
+            if (cloudData && cloudData.payload) {
+              window.appData = cloudData.payload;
+              renderAll();
+            }
+          } else {
+            docRef.set({ payload: window.appData });
+          }
+        }, (error) => {
+          console.error("Cloud sync snapshot error:", error);
+        });
+      } catch (e) {
+        console.warn("Cloud sync setup warning:", e);
+      }
+    }
+
+    window.savePermanentChanges = async function() {
+      try {
+        localStorage.setItem('byb_permanent_league_data_v2', JSON.stringify(window.appData));
+
+        if (db && auth && auth.currentUser) {
+          const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection('league_state').doc('current');
+          await docRef.set({ payload: window.appData });
+          showToast("Changes permanently saved & synced across devices!");
+        } else {
+          showToast("Changes saved locally!");
+        }
         renderAll();
       } catch (e) {
-        console.error("Failed to save:", e);
+        console.error("Failed to save changes:", e);
         showToast("Error saving changes.", true);
       }
     };
 
     window.saveData = function() {
-      // Automatically save to local state and memory
       renderAll();
     };
 
@@ -592,6 +641,12 @@
 
     window.onload = function() {
       lucide.createIcons();
+      initFirebase();
+      // Load local cache initially while cloud connects
+      const localSaved = localStorage.getItem('byb_permanent_league_data_v2');
+      if (localSaved) {
+        try { window.appData = JSON.parse(localSaved); } catch(e){}
+      }
       renderAll();
     };
 
@@ -793,7 +848,7 @@
       };
       saveData();
       closeAdminModal();
-      showToast("Headline updated! Click 'Save Changes' at the top to make it permanent.");
+      showToast("Headline updated! Click green 'Save Changes' at the top right to make it permanent.");
     }
 
     function renderSchedule() {
@@ -957,7 +1012,7 @@
         t.record = document.getElementById('editTeamRecord').value.trim();
         saveData();
         closeAdminModal();
-        showToast("Team updated! Click 'Save Changes' at the top to make it permanent.");
+        showToast("Team updated! Click green 'Save Changes' at top right to make permanent.");
       }
     }
 
@@ -998,7 +1053,7 @@
         p.sacks = parseInt(document.getElementById('editPlayerSacks').value) || 0;
         saveData();
         closeAdminModal();
-        showToast("Player updated! Click 'Save Changes' at the top to make it permanent.");
+        showToast("Player updated! Click green 'Save Changes' at top right to make permanent.");
       }
     }
 
@@ -1386,7 +1441,7 @@
         g.status = document.getElementById('editStatus').value;
         saveData();
         closeAdminModal();
-        showToast("Game updated! Click 'Save Changes' at the top to make it permanent.");
+        showToast("Game updated! Click green 'Save Changes' at top right to make permanent.");
       }
     }
 
@@ -1404,7 +1459,7 @@
       });
       saveData();
       closeAdminModal();
-      showToast("Game added! Click 'Save Changes' at the top to make it permanent.");
+      showToast("Game added! Click green 'Save Changes' at top right to make permanent.");
     }
 
     window.saveNewPlayer = function(e) {
@@ -1421,7 +1476,7 @@
       });
       saveData();
       closeAdminModal();
-      showToast("Player added! Click 'Save Changes' at the top to make it permanent.");
+      showToast("Player added! Click green 'Save Changes' at top right to make permanent.");
     }
 
     window.saveNewNews = function(e) {
@@ -1435,13 +1490,13 @@
       });
       saveData();
       closeAdminModal();
-      showToast("News published! Click 'Save Changes' at the top to make it permanent.");
+      showToast("News published! Click green 'Save Changes' at top right to make permanent.");
     }
 
     window.deleteNews = function(id) {
       window.appData.news = window.appData.news.filter(n => n.id !== id);
       saveData();
-      showToast("News deleted! Click 'Save Changes' at the top to make it permanent.");
+      showToast("News deleted! Click green 'Save Changes' at top right to make permanent.");
     }
 
     window.saveNewHof = function(e) {
@@ -1456,13 +1511,13 @@
       });
       saveData();
       closeAdminModal();
-      showToast("Added to HOF! Click 'Save Changes' at the top to make it permanent.");
+      showToast("Added to HOF! Click green 'Save Changes' at top right to make permanent.");
     }
 
     window.deleteHof = function(id) {
       window.appData.hof = window.appData.hof.filter(h => h.id !== id);
       saveData();
-      showToast("HOF entry deleted! Click 'Save Changes' at the top to make it permanent.");
+      showToast("HOF entry deleted! Click green 'Save Changes' at top right to make permanent.");
     }
 
     window.savePlayoffChampion = function(e) {
@@ -1470,7 +1525,7 @@
       window.appData.playoffs.championship.winnerId = document.getElementById('admChampTeam').value || null;
       saveData();
       closeAdminModal();
-      showToast("Playoff champion updated! Click 'Save Changes' at the top to make it permanent.");
+      showToast("Playoff champion updated! Click green 'Save Changes' at top right to make permanent.");
     }
   </script>
 </body>
