@@ -424,7 +424,7 @@
   <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-espn-card border border-espn-border rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-6 h-6"></i></button>
       <h3 class="font-display font-black text-xl text-white mb-1">SIGN IN OR CREATE ACCOUNT</h3>
       <p class="text-xs text-gray-400 mb-4">Enter your name and email to sign in or register your account.</p>
       <form onsubmit="handleUserAuth(event)" class="space-y-4">
@@ -436,7 +436,7 @@
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Email Address</label>
           <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="user@gmail.com">
         </div>
-        <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow">Sign In / Register</button>
+        <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow cursor-pointer">Sign In / Register</button>
       </form>
     </div>
   </div>
@@ -444,6 +444,7 @@
   <!-- ADMIN MODAL -->
   <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-espn-card border border-espn-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative my-6">
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-6 h-6"></i></button>
       <div id="adminModalContent"></div>
     </div>
   </div>
