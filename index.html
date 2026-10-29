@@ -1,8 +1,8 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Backyard Ball - Knee Football League</title>
   <link rel="manifest" href="manifest.json">
   <!-- Tailwind CSS -->
@@ -39,10 +39,12 @@
     body {
       background-color: #0d0d0d;
       color: #f3f4f6;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
     .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
+      height: 4px;
+      width: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #121212;
@@ -51,74 +53,75 @@
       background: #333;
       border-radius: 4px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #cc0000;
-    }
     .ticker-scroll {
       display: flex;
       overflow-x: auto;
       white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Touch target optimizations */
+    button, a {
+      touch-action: manipulation;
     }
   </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex flex-col">
+<body class="font-sans antialiased min-h-screen flex flex-col pb-6 select-none">
 
   <!-- TOP ESPN TICKER BAR -->
   <div class="bg-black border-b border-espn-border text-xs flex items-center h-10 overflow-hidden sticky top-0 z-50">
-    <div class="bg-espn-red text-white font-bold px-3 py-2 flex items-center gap-1 uppercase tracking-wider z-10 shrink-0 shadow-lg">
-      <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i> BYB LIVE
+    <div class="bg-espn-red text-white font-bold px-2.5 py-2 flex items-center gap-1 uppercase tracking-wider z-10 shrink-0 shadow-lg text-[11px]">
+      <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i> BYB
     </div>
-    <div id="tickerContent" class="ticker-scroll custom-scrollbar flex items-center space-x-6 px-4 py-1 w-full text-gray-300">
+    <div id="tickerContent" class="ticker-scroll custom-scrollbar flex items-center space-x-4 px-3 py-1 w-full text-gray-300 text-xs">
       <!-- Dynamic Ticker Games Rendered via JS -->
     </div>
   </div>
 
   <!-- MAIN HEADER / NAVIGATION -->
   <header class="bg-espn-black border-b border-espn-border shadow-md sticky top-10 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14 sm:h-16">
         
         <!-- LOGO BRANDING -->
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
-          <div class="flex items-center bg-black px-3 py-1.5 rounded-lg border border-espn-border shadow-inner">
-            <span class="font-display font-black text-2xl text-white tracking-tighter">B</span>
-            <!-- Custom Field Goal Y Logo -->
-            <svg class="w-6 h-7 text-espn-red mx-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchTab('dashboard')">
+          <div class="flex items-center bg-black px-2.5 py-1 rounded-lg border border-espn-border shadow-inner">
+            <span class="font-display font-black text-xl text-white tracking-tighter">B</span>
+            <svg class="w-5 h-6 text-espn-red mx-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 3v6a7 7 0 0 0 14 0V3"></path>
               <line x1="12" y1="16" x2="12" y2="22"></line>
               <line x1="8" y1="22" x2="16" y2="22"></line>
             </svg>
-            <span class="font-display font-black text-2xl text-white tracking-tighter">B</span>
+            <span class="font-display font-black text-xl text-white tracking-tighter">B</span>
           </div>
-          <div class="hidden sm:block">
-            <h1 class="font-display font-black text-lg text-white leading-none tracking-wide">BACKYARD BALL</h1>
-            <p class="text-[10px] text-espn-red font-bold uppercase tracking-widest">Knee Football League</p>
+          <div>
+            <h1 class="font-display font-black text-base sm:text-lg text-white leading-none tracking-wide">BACKYARD BALL</h1>
+            <p class="text-[9px] text-espn-red font-bold uppercase tracking-widest">Knee Football</p>
           </div>
         </div>
 
         <!-- NAV TABS (Desktop) -->
         <nav class="hidden lg:flex space-x-1 font-semibold text-xs uppercase tracking-wider">
           <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Dashboard</button>
-          <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Schedule & Scores</button>
+          <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Schedule</button>
           <button onclick="switchTab('standings')" id="nav-standings" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Standings</button>
-          <button onclick="switchTab('teams')" id="nav-teams" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Teams & Rosters</button>
-          <button onclick="switchTab('stats')" id="nav-stats" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Player Stats</button>
+          <button onclick="switchTab('teams')" id="nav-teams" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Teams</button>
+          <button onclick="switchTab('stats')" id="nav-stats" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Stats</button>
           <button onclick="switchTab('playoffs')" id="nav-playoffs" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">Playoffs</button>
-          <button onclick="switchTab('news')" id="nav-news" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">News & Rankings</button>
+          <button onclick="switchTab('news')" id="nav-news" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition">News</button>
           <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition flex items-center gap-1">
-            <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Chat Room
+            <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Chat
           </button>
           <button onclick="switchTab('hof')" id="nav-hof" class="nav-btn px-3 py-2 rounded-md hover:text-white hover:bg-espn-card transition text-espn-gold flex items-center gap-1">
-            <i data-lucide="award" class="w-3.5 h-3.5"></i> Hall of Fame
+            <i data-lucide="award" class="w-3.5 h-3.5"></i> HOF
           </button>
         </nav>
 
-        <!-- USER & ADMIN CONTROL -->
-        <div class="flex items-center space-x-3">
-          <div id="userInfo" class="flex items-center gap-2">
+        <!-- USER & MOBILE MENU BTN -->
+        <div class="flex items-center space-x-2">
+          <div id="userInfo" class="flex items-center gap-1">
             <!-- Rendered dynamically -->
           </div>
-          <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-gray-300 hover:text-white focus:outline-none">
+          <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-gray-300 hover:text-white focus:outline-none active:bg-espn-card rounded-lg">
             <i data-lucide="menu" class="w-6 h-6"></i>
           </button>
         </div>
@@ -126,7 +129,20 @@
       </div>
     </div>
 
-    <!-- MOBILE MENU DROPDOWN -->
+    <!-- HORIZONTAL MOBILE NAVIGATION CAROUSEL (Easy Thumb Access) -->
+    <div class="lg:hidden bg-black/90 border-b border-espn-border px-2 py-2 overflow-x-auto flex space-x-1.5 custom-scrollbar text-xs font-bold uppercase tracking-wider">
+      <button onclick="switchTab('dashboard')" id="m-nav-dashboard" class="m-nav-btn px-3 py-1.5 rounded-lg bg-espn-card shrink-0 text-white border border-espn-border">Dashboard</button>
+      <button onclick="switchTab('schedule')" id="m-nav-schedule" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-400 shrink-0 border border-espn-border">Schedule</button>
+      <button onclick="switchTab('standings')" id="m-nav-standings" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-400 shrink-0 border border-espn-border">Standings</button>
+      <button onclick="switchTab('teams')" id="m-nav-teams" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-400 shrink-0 border border-espn-border">Teams</button>
+      <button onclick="switchTab('stats')" id="m-nav-stats" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-400 shrink-0 border border-espn-border">Stats</button>
+      <button onclick="switchTab('playoffs')" id="m-nav-playoffs" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-400 shrink-0 border border-espn-border">Playoffs</button>
+      <button onclick="switchTab('news')" id="m-nav-news" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-gray-400 shrink-0 border border-espn-border">News</button>
+      <button onclick="switchTab('chat')" id="m-nav-chat" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-espn-red shrink-0 border border-espn-border">Chat</button>
+      <button onclick="switchTab('hof')" id="m-nav-hof" class="m-nav-btn px-3 py-1.5 rounded-lg bg-black text-espn-gold shrink-0 border border-espn-border">HOF</button>
+    </div>
+
+    <!-- FULL MOBILE MENU DROPDOWN -->
     <div id="mobileMenu" class="hidden lg:hidden bg-espn-black border-t border-espn-border px-4 pt-2 pb-4 space-y-1 text-sm font-semibold uppercase">
       <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md hover:bg-espn-card">Dashboard</button>
       <button onclick="switchTab('schedule'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md hover:bg-espn-card">Schedule & Scores</button>
@@ -140,72 +156,72 @@
     </div>
   </header>
 
-  <!-- ADMIN COMMISSIONER BANNER (Shows when logged in as admin) -->
-  <div id="adminBar" class="hidden bg-gradient-to-r from-red-900 via-espn-red to-black text-white px-4 py-2 text-xs font-bold flex items-center justify-between shadow-inner">
+  <!-- ADMIN COMMISSIONER BANNER -->
+  <div id="adminBar" class="hidden bg-gradient-to-r from-red-900 via-espn-red to-black text-white px-3 py-2 text-xs font-bold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-inner">
     <div class="flex items-center space-x-2">
-      <span class="bg-black text-espn-gold px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-wider">COMMISH MODE</span>
-      <span>Logged in as Commissioner (hpillon77@gmail.com). You have full league editing access.</span>
+      <span class="bg-black text-espn-gold px-1.5 py-0.5 rounded text-[9px] uppercase font-black tracking-wider">COMMISH</span>
+      <span class="text-[11px] truncate">hpillon77@gmail.com</span>
     </div>
-    <button onclick="openAdminModal('general')" class="bg-white text-black px-2.5 py-1 rounded text-xs font-bold hover:bg-gray-200 transition shadow">
+    <button onclick="openAdminModal('general')" class="bg-white text-black px-2.5 py-1 rounded text-[11px] font-bold hover:bg-gray-200 transition shadow w-full sm:w-auto text-center">
       <i data-lucide="settings" class="w-3 h-3 inline mr-1"></i> Admin Dashboard
     </button>
   </div>
 
   <!-- MAIN CONTENT CONTAINER -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
 
     <!-- TAB 1: DASHBOARD / HOME -->
-    <div id="tab-dashboard" class="tab-content space-y-6">
+    <div id="tab-dashboard" class="tab-content space-y-4 sm:space-y-6">
       
       <!-- HERO BANNER / FEATURED NEWS -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div class="lg:col-span-2 bg-espn-card rounded-xl overflow-hidden border border-espn-border shadow-xl relative group">
-          <div class="h-64 sm:h-80 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=1200&q=80');">
+          <div class="h-52 sm:h-80 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=1200&q=80');">
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
-            <div class="absolute top-4 left-4 bg-espn-red text-white text-xs font-black px-3 py-1 uppercase rounded tracking-wider">
-              HEADLINE STORY
+            <div class="absolute top-3 left-3 bg-espn-red text-white text-[10px] font-black px-2 py-0.5 uppercase rounded tracking-wider">
+              HEADLINE
             </div>
-            <div class="absolute bottom-6 left-6 right-6">
-              <p class="text-espn-gold font-bold text-xs uppercase tracking-widest mb-1">Knee Bowl Season XVII Preview</p>
-              <h2 class="text-2xl sm:text-3xl font-display font-black text-white leading-tight mb-2">
-                Mud, Turf, and Glory: Knee Football League Ready for High-Stakes Showdowns
+            <div class="absolute bottom-4 left-4 right-4">
+              <p class="text-espn-gold font-bold text-[10px] uppercase tracking-widest mb-1">Knee Bowl Season XVII</p>
+              <h2 class="text-lg sm:text-2xl font-display font-black text-white leading-tight mb-1">
+                Mud, Turf, and Glory: Knee Football League Ready for Kickoff
               </h2>
-              <p class="text-gray-300 text-sm line-clamp-2">
-                With Commissioner hpillon77 officially locking in field assignments for Field 1 and Field 2, teams are making final roster tweaks before kickoff.
+              <p class="text-gray-300 text-xs sm:text-sm line-clamp-2">
+                Field 1 and Field 2 assignments are locked in for Sunday!
               </p>
             </div>
           </div>
         </div>
 
         <!-- QUICK POWER RANKINGS CARD -->
-        <div class="bg-espn-card rounded-xl border border-espn-border p-5 flex flex-col justify-between shadow-xl">
+        <div class="bg-espn-card rounded-xl border border-espn-border p-4 sm:p-5 flex flex-col justify-between shadow-xl">
           <div>
-            <div class="flex items-center justify-between pb-3 border-b border-espn-border mb-3">
-              <h3 class="font-display font-black text-lg text-white flex items-center gap-2">
-                <i data-lucide="trending-up" class="text-espn-red w-5 h-5"></i> POWER RANKINGS
+            <div class="flex items-center justify-between pb-2.5 border-b border-espn-border mb-3">
+              <h3 class="font-display font-black text-base text-white flex items-center gap-1.5">
+                <i data-lucide="trending-up" class="text-espn-red w-4 h-4"></i> POWER RANKINGS
               </h3>
-              <span class="text-xs text-gray-400 font-semibold">WEEK 5</span>
+              <span class="text-[10px] text-gray-400 font-semibold">WEEK 5</span>
             </div>
-            <div id="dashPowerRankings" class="space-y-3">
+            <div id="dashPowerRankings" class="space-y-2">
               <!-- Rendered via JS -->
             </div>
           </div>
-          <button onclick="switchTab('news')" class="mt-4 text-xs font-bold text-espn-red hover:underline uppercase text-center block w-full">
-            View Full News & Rankings &rarr;
+          <button onclick="switchTab('news')" class="mt-3 text-xs font-bold text-espn-red hover:underline uppercase text-center block w-full py-1">
+            View Rankings &rarr;
           </button>
         </div>
       </div>
 
       <!-- MID DASHBOARD: STANDINGS + STAT LEADERS -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         
         <!-- QUICK STANDINGS -->
-        <div class="bg-espn-card rounded-xl border border-espn-border p-5 shadow-xl">
-          <div class="flex items-center justify-between pb-3 border-b border-espn-border mb-4">
-            <h3 class="font-display font-black text-lg text-white flex items-center gap-2">
-              <i data-lucide="shield" class="text-espn-red w-5 h-5"></i> LEAGUE STANDINGS
+        <div class="bg-espn-card rounded-xl border border-espn-border p-4 shadow-xl">
+          <div class="flex items-center justify-between pb-2.5 border-b border-espn-border mb-3">
+            <h3 class="font-display font-black text-base text-white flex items-center gap-1.5">
+              <i data-lucide="shield" class="text-espn-red w-4 h-4"></i> LEAGUE STANDINGS
             </h3>
-            <button onclick="switchTab('standings')" class="text-xs font-bold text-espn-red hover:underline uppercase">View Full</button>
+            <button onclick="switchTab('standings')" class="text-xs font-bold text-espn-red hover:underline uppercase">Full Table</button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
@@ -218,7 +234,7 @@
                   <th class="pb-2 text-center">DIFF</th>
                 </tr>
               </thead>
-              <tbody id="dashStandingsBody" class="divide-y divide-espn-border/50 text-sm">
+              <tbody id="dashStandingsBody" class="divide-y divide-espn-border/50 text-xs sm:text-sm">
                 <!-- JS Rendered -->
               </tbody>
             </table>
@@ -226,25 +242,25 @@
         </div>
 
         <!-- STATS HIGHLIGHT: TD & INT LEADERS -->
-        <div class="bg-espn-card rounded-xl border border-espn-border p-5 shadow-xl">
-          <div class="flex items-center justify-between pb-3 border-b border-espn-border mb-4">
-            <h3 class="font-display font-black text-lg text-white flex items-center gap-2">
-              <i data-lucide="zap" class="text-espn-gold w-5 h-5"></i> LEAGUE LEADERS
+        <div class="bg-espn-card rounded-xl border border-espn-border p-4 shadow-xl">
+          <div class="flex items-center justify-between pb-2.5 border-b border-espn-border mb-3">
+            <h3 class="font-display font-black text-base text-white flex items-center gap-1.5">
+              <i data-lucide="zap" class="text-espn-gold w-4 h-4"></i> STAT LEADERS
             </h3>
             <button onclick="switchTab('stats')" class="text-xs font-bold text-espn-red hover:underline uppercase">All Stats</button>
           </div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-2.5 sm:gap-4">
             <!-- TD Leaders -->
-            <div class="bg-black/50 p-3 rounded-lg border border-espn-border">
-              <p class="text-[10px] font-bold uppercase text-espn-gold mb-2">Touchdown Leaders (TD)</p>
-              <div id="dashTdLeaders" class="space-y-2">
+            <div class="bg-black/50 p-2.5 rounded-lg border border-espn-border">
+              <p class="text-[9px] font-bold uppercase text-espn-gold mb-1.5">Touchdowns (TD)</p>
+              <div id="dashTdLeaders" class="space-y-1.5 text-xs">
                 <!-- JS Rendered -->
               </div>
             </div>
             <!-- INT Leaders -->
-            <div class="bg-black/50 p-3 rounded-lg border border-espn-border">
-              <p class="text-[10px] font-bold uppercase text-espn-red mb-2">Interception Leaders (INT)</p>
-              <div id="dashIntLeaders" class="space-y-2">
+            <div class="bg-black/50 p-2.5 rounded-lg border border-espn-border">
+              <p class="text-[9px] font-bold uppercase text-espn-red mb-1.5">Interceptions (INT)</p>
+              <div id="dashIntLeaders" class="space-y-1.5 text-xs">
                 <!-- JS Rendered -->
               </div>
             </div>
@@ -256,50 +272,47 @@
     </div>
 
     <!-- TAB 2: SCHEDULE & SCORES -->
-    <div id="tab-schedule" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-espn-card p-4 rounded-xl border border-espn-border">
+    <div id="tab-schedule" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between gap-2 bg-espn-card p-3 sm:p-4 rounded-xl border border-espn-border">
         <div>
-          <h2 class="font-display font-black text-2xl text-white">SEASON SCHEDULE & SCORES</h2>
-          <p class="text-xs text-gray-400">View upcoming matchups, official game fields, and final scores.</p>
+          <h2 class="font-display font-black text-lg sm:text-2xl text-white">SCHEDULE & SCORES</h2>
+          <p class="text-[11px] text-gray-400">Matchups, fields, and final results.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="adminAddGameBtn" onclick="openAdminModal('addGame')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Game
-          </button>
-        </div>
+        <button id="adminAddGameBtn" onclick="openAdminModal('addGame')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition shrink-0">
+          + Add Game
+        </button>
       </div>
 
-      <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <!-- JS Rendered Game Cards -->
       </div>
     </div>
 
     <!-- TAB 3: STANDINGS -->
-    <div id="tab-standings" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-espn-card p-4 rounded-xl border border-espn-border">
+    <div id="tab-standings" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between gap-2 bg-espn-card p-3 sm:p-4 rounded-xl border border-espn-border">
         <div>
-          <h2 class="font-display font-black text-2xl text-white">OFFICIAL LEAGUE STANDINGS</h2>
-          <p class="text-xs text-gray-400">Updated weekly after all Backyard Ball field matches.</p>
+          <h2 class="font-display font-black text-lg sm:text-2xl text-white">LEAGUE STANDINGS</h2>
+          <p class="text-[11px] text-gray-400">Official rankings updated weekly.</p>
         </div>
-        <button id="adminEditStandingsBtn" onclick="openAdminModal('editStandings')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
-          <i data-lucide="edit-3" class="w-4 h-4"></i> Edit Standings
+        <button id="adminEditStandingsBtn" onclick="openAdminModal('editStandings')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition shrink-0">
+          Edit
         </button>
       </div>
 
       <div class="bg-espn-card rounded-xl border border-espn-border overflow-hidden shadow-xl">
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-black text-gray-400 text-xs uppercase tracking-wider font-bold border-b border-espn-border">
+          <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
+            <thead class="bg-black text-gray-400 text-[10px] uppercase tracking-wider font-bold border-b border-espn-border">
               <tr>
-                <th class="p-4">Rank & Team</th>
-                <th class="p-4 text-center">W</th>
-                <th class="p-4 text-center">L</th>
-                <th class="p-4 text-center">T</th>
-                <th class="p-4 text-center">PCT</th>
-                <th class="p-4 text-center">PF</th>
-                <th class="p-4 text-center">PA</th>
-                <th class="p-4 text-center">DIFF</th>
-                <th class="p-4 text-center">STREAK</th>
+                <th class="p-3">Team</th>
+                <th class="p-3 text-center">W</th>
+                <th class="p-3 text-center">L</th>
+                <th class="p-3 text-center">T</th>
+                <th class="p-3 text-center">PCT</th>
+                <th class="p-3 text-center">PF</th>
+                <th class="p-3 text-center">PA</th>
+                <th class="p-3 text-center">DIFF</th>
               </tr>
             </thead>
             <tbody id="fullStandingsBody" class="divide-y divide-espn-border">
@@ -311,58 +324,54 @@
     </div>
 
     <!-- TAB 4: TEAMS & ROSTERS -->
-    <div id="tab-teams" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-espn-card p-4 rounded-xl border border-espn-border">
+    <div id="tab-teams" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between gap-2 bg-espn-card p-3 sm:p-4 rounded-xl border border-espn-border">
         <div>
-          <h2 class="font-display font-black text-2xl text-white">TEAMS & ROSTERS</h2>
-          <p class="text-xs text-gray-400">Select a team to view active knee football roster and player positions.</p>
+          <h2 class="font-display font-black text-lg sm:text-2xl text-white">TEAMS & ROSTERS</h2>
+          <p class="text-[11px] text-gray-400">Select a team below to view roster.</p>
         </div>
-        <button id="adminAddTeamBtn" onclick="openAdminModal('addTeam')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Team
-        </button>
       </div>
 
       <!-- Team Selector Tabs -->
-      <div id="teamSelectorList" class="flex space-x-2 overflow-x-auto pb-2 custom-scrollbar">
+      <div id="teamSelectorList" class="flex space-x-2 overflow-x-auto pb-1 custom-scrollbar">
         <!-- JS Rendered Team Pills -->
       </div>
 
       <!-- Active Team Display -->
-      <div id="activeTeamView" class="space-y-6">
+      <div id="activeTeamView" class="space-y-4">
         <!-- JS Rendered Team Card & Roster -->
       </div>
     </div>
 
     <!-- TAB 5: PLAYER STATS -->
-    <div id="tab-stats" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-espn-card p-4 rounded-xl border border-espn-border">
+    <div id="tab-stats" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between gap-2 bg-espn-card p-3 sm:p-4 rounded-xl border border-espn-border">
         <div>
-          <h2 class="font-display font-black text-2xl text-white">PLAYER STATS LEADERBOARD</h2>
-          <p class="text-xs text-gray-400">Strict stat tracking for Touchdowns (TD), Interceptions (INT), and Sacks.</p>
+          <h2 class="font-display font-black text-lg sm:text-2xl text-white">PLAYER STATS</h2>
+          <p class="text-[11px] text-gray-400">Touchdowns, Interceptions & Sacks.</p>
         </div>
-        <button id="adminEditStatsBtn" onclick="openAdminModal('editPlayerStats')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
-          <i data-lucide="edit-3" class="w-4 h-4"></i> Manage Player Stats
+        <button id="adminEditStatsBtn" onclick="openAdminModal('editPlayerStats')" class="hidden bg-espn-red text-white px-2 py-1 rounded text-xs font-bold shrink-0">
+          Edit Stats
         </button>
       </div>
 
       <div class="bg-espn-card rounded-xl border border-espn-border overflow-hidden shadow-xl">
-        <div class="p-4 bg-black/40 border-b border-espn-border flex flex-wrap gap-3 items-center justify-between">
-          <span class="text-xs text-gray-400 font-bold uppercase">Sort By Category:</span>
-          <div class="flex flex-wrap gap-2 text-xs">
-            <button onclick="sortStatsBy('td')" class="stat-sort-btn px-4 py-1 rounded bg-espn-red text-white font-bold">Total TDs</button>
-            <button onclick="sortStatsBy('int')" class="stat-sort-btn px-4 py-1 rounded bg-espn-border hover:bg-gray-700 font-bold">INTs</button>
-            <button onclick="sortStatsBy('sacks')" class="stat-sort-btn px-4 py-1 rounded bg-espn-border hover:bg-gray-700 font-bold">Sacks</button>
+        <div class="p-3 bg-black/40 border-b border-espn-border flex items-center justify-between text-xs">
+          <span class="text-gray-400 font-bold uppercase text-[10px]">Sort:</span>
+          <div class="flex gap-1.5">
+            <button onclick="sortStatsBy('td')" class="stat-sort-btn px-2.5 py-1 rounded bg-espn-red text-white font-bold text-[11px]">TDs</button>
+            <button onclick="sortStatsBy('int')" class="stat-sort-btn px-2.5 py-1 rounded bg-espn-border text-gray-300 font-bold text-[11px]">INTs</button>
+            <button onclick="sortStatsBy('sacks')" class="stat-sort-btn px-2.5 py-1 rounded bg-espn-border text-gray-300 font-bold text-[11px]">Sacks</button>
           </div>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-black text-gray-400 text-xs uppercase tracking-wider font-bold border-b border-espn-border">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-black text-gray-400 text-[10px] uppercase tracking-wider font-bold border-b border-espn-border">
               <tr>
-                <th class="p-4">Player</th>
-                <th class="p-4">Team</th>
-                <th class="p-4 text-center text-espn-gold font-black text-base">TOUCHDOWNS (TD)</th>
-                <th class="p-4 text-center text-espn-red font-black text-base">INTERCEPTIONS (INT)</th>
-                <th class="p-4 text-center text-gray-300 font-bold text-base">SACKS</th>
+                <th class="p-3">Player</th>
+                <th class="p-3 text-center text-espn-gold">TD</th>
+                <th class="p-3 text-center text-espn-red">INT</th>
+                <th class="p-3 text-center text-gray-300">Sacks</th>
               </tr>
             </thead>
             <tbody id="playerStatsTableBody" class="divide-y divide-espn-border">
@@ -374,81 +383,57 @@
     </div>
 
     <!-- TAB 6: PLAYOFFS -->
-    <div id="tab-playoffs" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-espn-card p-4 rounded-xl border border-espn-border">
+    <div id="tab-playoffs" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between gap-2 bg-espn-card p-3 sm:p-4 rounded-xl border border-espn-border">
         <div>
-          <h2 class="font-display font-black text-2xl text-white">PLAYOFF BRACKET</h2>
-          <p class="text-xs text-gray-400">Road to the Knee Bowl Championship.</p>
+          <h2 class="font-display font-black text-lg sm:text-2xl text-white">PLAYOFF BRACKET</h2>
+          <p class="text-[11px] text-gray-400">Knee Bowl Championship race.</p>
         </div>
-        <button id="adminEditPlayoffsBtn" onclick="openAdminModal('editPlayoffs')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
-          <i data-lucide="edit-3" class="w-4 h-4"></i> Edit Bracket
-        </button>
       </div>
 
-      <!-- VISUAL BRACKET TREE -->
-      <div class="bg-espn-card p-6 rounded-xl border border-espn-border overflow-x-auto shadow-xl">
-        <div class="min-w-[700px] grid grid-cols-3 gap-8 relative items-center">
-          
-          <!-- SEMIFINALS -->
-          <div class="space-y-8">
-            <h3 class="text-xs font-black uppercase text-espn-red tracking-widest text-center">Semifinals</h3>
-            
-            <!-- Semi 1 -->
-            <div id="bracket-semi1" class="bg-black p-3 rounded-lg border border-espn-border shadow space-y-2 relative">
-              <!-- JS Rendered -->
-            </div>
-
-            <!-- Semi 2 -->
-            <div id="bracket-semi2" class="bg-black p-3 rounded-lg border border-espn-border shadow space-y-2 relative">
-              <!-- JS Rendered -->
-            </div>
+      <!-- MOBILE Playoff Bracket Cards (Vertical Stack for phones) -->
+      <div class="space-y-3">
+        <!-- Semifinals Card -->
+        <div class="bg-espn-card p-4 rounded-xl border border-espn-border space-y-3">
+          <h3 class="text-xs font-black uppercase text-espn-red tracking-widest text-center">Semifinals</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div id="m-bracket-semi1" class="bg-black p-3 rounded-lg border border-espn-border space-y-1"></div>
+            <div id="m-bracket-semi2" class="bg-black p-3 rounded-lg border border-espn-border space-y-1"></div>
           </div>
+        </div>
 
-          <!-- KNEE BOWL CHAMPIONSHIP -->
-          <div class="space-y-4">
-            <h3 class="text-xs font-black uppercase text-espn-gold tracking-widest text-center flex items-center justify-center gap-1">
-              <i data-lucide="trophy" class="w-4 h-4"></i> Knee Bowl Championship
-            </h3>
-            <div id="bracket-championship" class="bg-black p-4 rounded-xl border-2 border-espn-gold shadow-2xl space-y-3">
-              <!-- JS Rendered -->
-            </div>
+        <!-- Championship Card -->
+        <div class="bg-espn-card p-4 rounded-xl border-2 border-espn-gold space-y-3 text-center">
+          <h3 class="text-xs font-black uppercase text-espn-gold tracking-widest flex items-center justify-center gap-1">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Knee Bowl Championship
+          </h3>
+          <div id="m-bracket-championship" class="bg-black p-3 rounded-lg border border-espn-border space-y-1 max-w-sm mx-auto"></div>
+          <div class="pt-2">
+            <span class="text-[10px] font-bold uppercase text-espn-gold block">LEAGUE CHAMPION</span>
+            <h4 id="m-bracketWinnerName" class="text-xl font-display font-black text-white">TBD</h4>
           </div>
-
-          <!-- CHAMPION HIGHLIGHT -->
-          <div class="text-center bg-gradient-to-br from-yellow-900/40 to-black p-6 rounded-xl border border-espn-gold">
-            <i data-lucide="crown" class="w-12 h-12 text-espn-gold mx-auto mb-2 animate-bounce"></i>
-            <span class="text-xs font-bold uppercase tracking-widest text-espn-gold block">LEAGUE CHAMPION</span>
-            <h4 id="bracketWinnerName" class="text-2xl font-display font-black text-white mt-1">TBD</h4>
-          </div>
-
         </div>
       </div>
     </div>
 
-    <!-- TAB 7: NEWS & POWER RANKINGS -->
-    <div id="tab-news" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-espn-card p-4 rounded-xl border border-espn-border">
-        <div>
-          <h2 class="font-display font-black text-2xl text-white">NEWS & POWER RANKINGS</h2>
-          <p class="text-xs text-gray-400">Latest Backyard Ball articles, field recaps, and weekly rankings.</p>
-        </div>
-        <button id="adminAddNewsBtn" onclick="openAdminModal('addNews')" class="hidden bg-espn-red hover:bg-espn-darkRed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i> Add News Article
-        </button>
+    <!-- TAB 7: NEWS & RANKINGS -->
+    <div id="tab-news" class="tab-content hidden space-y-4">
+      <div class="bg-espn-card p-3 sm:p-4 rounded-xl border border-espn-border">
+        <h2 class="font-display font-black text-lg sm:text-2xl text-white">NEWS & RANKINGS</h2>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- News Feed (2 cols) -->
-        <div class="lg:col-span-2 space-y-4" id="newsFeedContainer">
+      <div class="space-y-4">
+        <!-- News Feed -->
+        <div class="space-y-3" id="newsFeedContainer">
           <!-- JS Rendered -->
         </div>
 
-        <!-- Power Rankings Full List (1 col) -->
-        <div class="bg-espn-card p-5 rounded-xl border border-espn-border shadow-xl h-fit">
-          <h3 class="font-display font-black text-lg text-white border-b border-espn-border pb-3 mb-4 flex items-center gap-2">
-            <i data-lucide="list-ordered" class="text-espn-red w-5 h-5"></i> POWER RANKINGS
+        <!-- Power Rankings Full List -->
+        <div class="bg-espn-card p-4 rounded-xl border border-espn-border shadow-xl">
+          <h3 class="font-display font-black text-base text-white border-b border-espn-border pb-2 mb-3">
+            POWER RANKINGS
           </h3>
-          <div id="fullPowerRankingsList" class="space-y-3">
+          <div id="fullPowerRankingsList" class="space-y-2">
             <!-- JS Rendered -->
           </div>
         </div>
@@ -456,36 +441,30 @@
     </div>
 
     <!-- TAB 8: CHAT ROOM -->
-    <div id="tab-chat" class="tab-content hidden space-y-4">
-      <div class="bg-espn-card p-4 rounded-xl border border-espn-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <h2 class="font-display font-black text-2xl text-white flex items-center gap-2">
-            <i data-lucide="messages-square" class="text-espn-red"></i> BACKYARD FAN CHAT ROOM
-          </h2>
-          <p class="text-xs text-gray-400">Talk trash, discuss stats, and coordinate field pickups. Must be logged in!</p>
-        </div>
+    <div id="tab-chat" class="tab-content hidden space-y-3">
+      <div class="bg-espn-card p-3 rounded-xl border border-espn-border">
+        <h2 class="font-display font-black text-lg text-white flex items-center gap-2">
+          <i data-lucide="messages-square" class="text-espn-red w-5 h-5"></i> CHAT ROOM
+        </h2>
       </div>
 
       <!-- CHAT CONTAINER -->
-      <div class="bg-espn-card border border-espn-border rounded-xl shadow-xl flex flex-col h-[550px]">
+      <div class="bg-espn-card border border-espn-border rounded-xl shadow-xl flex flex-col h-[450px] sm:h-[550px]">
         <!-- Messages Area -->
-        <div id="chatMessages" class="flex-grow p-4 overflow-y-auto space-y-4 custom-scrollbar">
+        <div id="chatMessages" class="flex-grow p-3 overflow-y-auto space-y-3 custom-scrollbar">
           <!-- JS Rendered Messages -->
         </div>
 
         <!-- Chat Input Bar -->
-        <div class="p-3 bg-black border-t border-espn-border">
-          <div id="chatAuthPrompt" class="hidden text-center py-2 text-xs text-gray-400">
-            <span>You must </span>
-            <button onclick="openAuthModal()" class="text-espn-red font-bold underline">create an account / log in</button>
-            <span> to participate in the chat room.</span>
+        <div class="p-2.5 bg-black border-t border-espn-border">
+          <div id="chatAuthPrompt" class="hidden text-center py-1 text-xs text-gray-400">
+            <button onclick="openAuthModal()" class="text-espn-red font-bold underline">Sign in to chat</button>
           </div>
 
           <form id="chatForm" onsubmit="sendChatMessage(event)" class="flex gap-2">
-            <input type="text" id="chatInput" placeholder="Type your message here..." class="flex-grow bg-espn-card border border-espn-border rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-espn-red" required>
-            <button type="submit" class="bg-espn-red hover:bg-espn-darkRed text-white font-bold px-5 py-2 rounded-lg text-sm transition flex items-center gap-1 shadow">
-              <span>Send</span>
-              <i data-lucide="send" class="w-4 h-4"></i>
+            <input type="text" id="chatInput" placeholder="Type a message..." class="flex-grow bg-espn-card border border-espn-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-espn-red" required>
+            <button type="submit" class="bg-espn-red text-white font-bold px-3 py-2 rounded-lg text-xs transition shrink-0">
+              Send
             </button>
           </form>
         </div>
@@ -493,32 +472,22 @@
     </div>
 
     <!-- TAB 9: HALL OF FAME -->
-    <div id="tab-hof" class="tab-content hidden space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-yellow-950 via-espn-card to-black p-6 rounded-xl border border-espn-gold shadow-xl">
-        <div class="flex items-center gap-4">
-          <div class="bg-espn-gold/10 p-3 rounded-full border border-espn-gold">
-            <i data-lucide="award" class="w-10 h-10 text-espn-gold"></i>
-          </div>
-          <div>
-            <h2 class="font-display font-black text-2xl text-white">BACKYARD BALL HALL OF FAME</h2>
-            <p class="text-xs text-espn-gold">Honoring Knee Football legends, championship dynasties, and historic award winners.</p>
-          </div>
-        </div>
-        <button id="adminAddHofBtn" onclick="openAdminModal('addHof')" class="hidden bg-espn-gold hover:bg-yellow-600 text-black px-4 py-2 rounded-lg text-xs font-black transition flex items-center gap-1 shadow">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i> Induct Legend
-        </button>
+    <div id="tab-hof" class="tab-content hidden space-y-4">
+      <div class="bg-gradient-to-r from-yellow-950 via-espn-card to-black p-4 rounded-xl border border-espn-gold shadow-xl">
+        <h2 class="font-display font-black text-xl text-white">HALL OF FAME</h2>
+        <p class="text-xs text-espn-gold">Knee Football Legends & Dynasties.</p>
       </div>
 
       <!-- HOF FILTER CATEGORIES -->
-      <div class="flex space-x-2 border-b border-espn-border pb-3">
-        <button onclick="filterHof('all')" class="hof-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-espn-gold text-black">All Legends</button>
-        <button onclick="filterHof('player')" class="hof-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-espn-card hover:bg-gray-800 text-gray-300">Players</button>
-        <button onclick="filterHof('team')" class="hof-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-espn-card hover:bg-gray-800 text-gray-300">Teams</button>
-        <button onclick="filterHof('award')" class="hof-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-espn-card hover:bg-gray-800 text-gray-300">Awards</button>
+      <div class="flex space-x-1.5 border-b border-espn-border pb-2 overflow-x-auto text-xs">
+        <button onclick="filterHof('all')" class="hof-filter-btn px-3 py-1 rounded-full font-bold bg-espn-gold text-black shrink-0">All</button>
+        <button onclick="filterHof('player')" class="hof-filter-btn px-3 py-1 rounded-full font-bold bg-espn-card text-gray-300 shrink-0">Players</button>
+        <button onclick="filterHof('team')" class="hof-filter-btn px-3 py-1 rounded-full font-bold bg-espn-card text-gray-300 shrink-0">Teams</button>
+        <button onclick="filterHof('award')" class="hof-filter-btn px-3 py-1 rounded-full font-bold bg-espn-card text-gray-300 shrink-0">Awards</button>
       </div>
 
       <!-- HOF GRID -->
-      <div id="hofGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="hofGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <!-- JS Rendered -->
       </div>
     </div>
@@ -527,29 +496,27 @@
 
   <!-- ACCOUNT / AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-espn-card border border-espn-border rounded-xl max-w-md w-full p-6 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+    <div class="bg-espn-card border border-espn-border rounded-xl max-w-sm w-full p-5 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
-      <h3 id="authModalTitle" class="font-display font-black text-xl text-white mb-1">CREATE ACCOUNT / LOGIN</h3>
-      <p class="text-xs text-gray-400 mb-4">Enter your details to create an account or sign in to chat.</p>
+      <h3 id="authModalTitle" class="font-display font-black text-lg text-white mb-1">SIGN IN / JOIN</h3>
 
-      <form onsubmit="handleUserAuth(event)" class="space-y-4">
+      <form onsubmit="handleUserAuth(event)" class="space-y-3 mt-3">
         <div>
-          <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Full Name / Display Name</label>
-          <input type="text" id="authUsername" class="w-full bg-black border border-espn-border rounded p-2.5 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. Hunter Pillon">
+          <label class="block text-[10px] font-bold uppercase text-gray-300 mb-1">Your Name</label>
+          <input type="text" id="authUsername" class="w-full bg-black border border-espn-border rounded p-2 text-xs text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. Hunter Pillon">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Email Address</label>
-          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded p-2.5 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. player@gmail.com">
-          <p class="text-[10px] text-gray-500 mt-1">Use <span class="text-espn-gold font-bold">hpillon77@gmail.com</span> for Commissioner Admin mode!</p>
+          <label class="block text-[10px] font-bold uppercase text-gray-300 mb-1">Email Address</label>
+          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded p-2 text-xs text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. player@gmail.com">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Password</label>
-          <input type="password" id="authPassword" class="w-full bg-black border border-espn-border rounded p-2.5 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="••••••••">
+          <label class="block text-[10px] font-bold uppercase text-gray-300 mb-1">Password</label>
+          <input type="password" id="authPassword" class="w-full bg-black border border-espn-border rounded p-2 text-xs text-white focus:outline-none focus:border-espn-red" required placeholder="••••••••">
         </div>
-        <button type="submit" class="w-full bg-espn-red hover:bg-espn-darkRed text-white font-bold py-2.5 rounded text-sm transition uppercase tracking-wider">
-          Create Account & Sign In
+        <button type="submit" class="w-full bg-espn-red text-white font-bold py-2 rounded text-xs transition uppercase tracking-wider">
+          Sign In
         </button>
       </form>
     </div>
@@ -557,40 +524,22 @@
 
   <!-- ADMIN MANAGEMENT MODAL -->
   <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-espn-card border border-espn-border rounded-xl max-w-2xl w-full p-6 shadow-2xl relative my-8">
-      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+    <div class="bg-espn-card border border-espn-border rounded-xl max-w-lg w-full p-5 shadow-2xl relative my-6">
+      <button onclick="closeAdminModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
       <div id="adminModalContent">
-        <!-- JS Rendered Forms Dynamically Based on Admin Action -->
+        <!-- JS Rendered -->
       </div>
     </div>
   </div>
 
-  <!-- CUSTOM FOOTER -->
-  <footer class="bg-black border-t border-espn-border py-8 text-center text-xs text-gray-500 mt-12">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-3">
-      <div class="flex items-center space-x-2">
-        <span class="font-display font-black text-xl text-white">B</span>
-        <svg class="w-5 h-6 text-espn-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-          <path d="M5 3v6a7 7 0 0 0 14 0V3"></path>
-          <line x1="12" y1="16" x2="12" y2="22"></line>
-        </svg>
-        <span class="font-display font-black text-xl text-white">B</span>
-      </div>
-      <p>© 2026 Backyard Ball Knee Football League. ESPN Style Network. Commissioner Contact: hpillon77@gmail.com</p>
-    </div>
-  </footer>
-
   <!-- SCRIPT LOGIC -->
   <script>
-    // GLOBAL STATE & LOCAL STORAGE KEYS
     const STORAGE_KEY = 'byb_knee_football_data_v1';
     const USER_KEY = 'byb_current_user_v1';
-
     const ADMIN_EMAIL = 'hpillon77@gmail.com';
 
-    // INITIAL SEED DATA
     const initialData = {
       teams: [
         { id: 't1', name: 'Backyard Blitz', record: '4-1', color: '#CC0000', logo: '⚡' },
@@ -605,43 +554,35 @@
         { teamId: 't4', w: 1, l: 4, t: 0, pf: 64, pa: 116, streak: 'L2' }
       ],
       games: [
-        { id: 'g1', homeId: 't1', awayId: 't2', homeScore: 28, awayScore: 21, status: 'FINAL', date: 'Oct 12, 2026', field: 'Field 1 - South Lawn' },
-        { id: 'g2', homeId: 't3', awayId: 't4', homeScore: 18, awayScore: 12, status: 'FINAL', date: 'Oct 19, 2026', field: 'Field 2 - Backyard Arena' },
-        { id: 'g3', homeId: 't1', awayId: 't3', homeScore: 32, awayScore: 14, status: 'FINAL', date: 'Oct 26, 2026', field: 'Field 1 - South Lawn' },
-        { id: 'g4', homeId: 't2', awayId: 't4', homeScore: 24, awayScore: 18, status: 'LIVE', date: 'Nov 2, 2026', field: 'Field 2 - Backyard Arena' },
-        { id: 'g5', homeId: 't4', awayId: 't1', homeScore: 0, awayScore: 0, status: 'UPCOMING', date: 'Nov 9, 2026', field: 'Field 1 - South Lawn' }
+        { id: 'g1', homeId: 't1', awayId: 't2', homeScore: 28, awayScore: 21, status: 'FINAL', date: 'Oct 12', field: 'Field 1' },
+        { id: 'g2', homeId: 't3', awayId: 't4', homeScore: 18, awayScore: 12, status: 'FINAL', date: 'Oct 19', field: 'Field 2' },
+        { id: 'g3', homeId: 't1', awayId: 't3', homeScore: 32, awayScore: 14, status: 'FINAL', date: 'Oct 26', field: 'Field 1' },
+        { id: 'g4', homeId: 't2', awayId: 't4', homeScore: 24, awayScore: 18, status: 'LIVE', date: 'Nov 2', field: 'Field 2' },
+        { id: 'g5', homeId: 't4', awayId: 't1', homeScore: 0, awayScore: 0, status: 'UPCOMING', date: 'Nov 9', field: 'Field 1' }
       ],
       players: [
         { id: 'p1', teamId: 't1', number: '12', name: 'Hunter Pillon', pos: 'QB/DB', td: 14, int: 5, sacks: 3 },
-        { id: 'p2', teamId: 't1', number: '88', name: 'Jake "Speedy" Miller', pos: 'WR/CB', td: 8, int: 4, sacks: 1 },
+        { id: 'p2', teamId: 't1', number: '88', name: 'Jake Miller', pos: 'WR/CB', td: 8, int: 4, sacks: 1 },
         { id: 'p3', teamId: 't2', number: '7', name: 'Mason Vance', pos: 'QB/LB', td: 10, int: 3, sacks: 6 },
         { id: 'p4', teamId: 't2', number: '21', name: 'Tyler Reed', pos: 'RB/DB', td: 6, int: 2, sacks: 0 },
-        { id: 'p5', teamId: 't3', number: '5', name: 'Cody "Tank" Smith', pos: 'RB/LB', td: 5, int: 1, sacks: 8 },
+        { id: 'p5', teamId: 't3', number: '5', name: 'Cody Smith', pos: 'RB/LB', td: 5, int: 1, sacks: 8 },
         { id: 'p6', teamId: 't4', number: '10', name: 'Sammy Brooks', pos: 'QB', td: 4, int: 2, sacks: 0 }
       ],
       news: [
         {
           id: 'n1',
           headline: 'Hunter Pillon Delivers 5-TD Masterclass on Field 1',
-          tagline: 'Backyard Blitz dominate Grass Burners in high-scoring thriller.',
-          date: 'Oct 27, 2026',
+          tagline: 'Backyard Blitz dominate Grass Burners.',
+          date: 'Oct 27',
           image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80',
-          content: 'In what many are calling the game of the season, Hunter Pillon threw for 4 TDs and ran for another on Field 1 - South Lawn, solidifying Backyard Blitz as championship favorites.'
-        },
-        {
-          id: 'n2',
-          headline: 'Field 2 Conditions Expecting Heavy Rain Ahead of Week 6',
-          tagline: 'Mud Football incoming as rain forecast threatens turf.',
-          date: 'Oct 25, 2026',
-          image: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=600&q=80',
-          content: 'The Commissioner has announced that Field 2 - Backyard Arena will host the upcoming Mud Dogs game regardless of weather conditions. Cleats non-compliant.'
+          content: 'Hunter Pillon threw for 4 TDs and ran for another on Field 1 - South Lawn.'
         }
       ],
       powerRankings: [
-        { rank: 1, teamId: 't1', change: '▲ 0', summary: 'Unstoppable passing attack.' },
-        { rank: 2, teamId: 't2', change: '▲ +1', summary: 'Solid defense and running game.' },
-        { rank: 3, teamId: 't3', change: '▼ -1', summary: 'Struggling with secondary coverage.' },
-        { rank: 4, teamId: 't4', change: '▲ 0', summary: 'Looking for turnaround in Week 6.' }
+        { rank: 1, teamId: 't1', change: '▲ 0', summary: 'Unstoppable offense.' },
+        { rank: 2, teamId: 't2', change: '▲ +1', summary: 'Solid ground attack.' },
+        { rank: 3, teamId: 't3', change: '▼ -1', summary: 'Defense needs work.' },
+        { rank: 4, teamId: 't4', change: '▲ 0', summary: 'Looking for a turn around.' }
       ],
       playoffs: {
         semi1: { homeId: 't1', awayId: 't4', homeScore: 35, awayScore: 14, status: 'FINAL', winnerId: 't1' },
@@ -649,17 +590,14 @@
         championship: { homeId: 't1', awayId: 't2', homeScore: null, awayScore: null, status: 'UPCOMING', winnerId: null }
       },
       chat: [
-        { id: 'c1', user: 'hpillon77@gmail.com', name: 'Hunter (Commish)', text: 'Welcome to Backyard Ball! Field 1 kickoff is at 2 PM sharp Sunday!', timestamp: '10:15 AM' },
-        { id: 'c2', user: 'mason@byb.com', name: 'Mason Vance', text: 'Grass Burners are taking the Knee Bowl trophy this year 🏆', timestamp: '10:18 AM' }
+        { id: 'c1', user: 'hpillon77@gmail.com', name: 'Hunter (Commish)', text: 'Welcome to Backyard Ball! Kickoff is at 2 PM Sunday!', timestamp: '10:15 AM' }
       ],
       hof: [
-        { id: 'h1', type: 'player', name: 'Hunter Pillon', title: 'All-Time TD Leader', year: 'Inducted 2025', desc: 'Recorded 42 TDs in two seasons and led Backyard Blitz to consecutive titles.' },
-        { id: 'h2', type: 'team', name: '2024 Backyard Blitz Dynasty', title: 'Undefeated Knee Bowl Champions', year: 'Inducted 2024', desc: 'Went 8-0 with a dominant +110 point differential.' },
-        { id: 'h3', type: 'award', name: '2025 MVP & DPOY', title: 'Cody "Tank" Smith', year: 'Season XVI', desc: 'Recorded 12 sacks and 15 rushing TDs in a single season.' }
+        { id: 'h1', type: 'player', name: 'Hunter Pillon', title: 'All-Time TD Leader', year: '2025', desc: '42 TDs in two seasons.' },
+        { id: 'h2', type: 'team', name: '2024 Backyard Blitz', title: 'Undefeated Champions', year: '2024', desc: '8-0 season record.' }
       ]
     };
 
-    // APP STATE
     let appData = loadData();
     let currentUser = loadUser();
     let currentTab = 'dashboard';
@@ -692,7 +630,6 @@
       return currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     }
 
-    // INITIALIZATION
     window.onload = function() {
       lucide.createIcons();
       renderAll();
@@ -719,13 +656,12 @@
         const home = appData.teams.find(t => t.id === g.homeId);
         const away = appData.teams.find(t => t.id === g.awayId);
         return `
-          <div class="flex items-center space-x-2 border-r border-espn-border pr-6 shrink-0">
+          <div class="flex items-center space-x-1.5 border-r border-espn-border pr-4 shrink-0">
             <span class="font-bold text-white">${away ? away.name : 'TBD'}</span>
             <span class="font-mono text-espn-gold">${g.status === 'UPCOMING' ? 'VS' : g.awayScore}</span>
             <span class="text-gray-500 font-bold">@</span>
             <span class="font-bold text-white">${home ? home.name : 'TBD'}</span>
             <span class="font-mono text-espn-gold">${g.status === 'UPCOMING' ? 'VS' : g.homeScore}</span>
-            <span class="text-[10px] bg-espn-card px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase ml-1">${g.status}</span>
           </div>
         `;
       }).join('');
@@ -737,11 +673,23 @@
       const target = document.getElementById('tab-' + tabId);
       if (target) target.classList.remove('hidden');
 
+      // Update Desktop Nav
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('text-espn-red', 'bg-espn-card');
       });
       const activeNav = document.getElementById('nav-' + tabId);
       if (activeNav) activeNav.classList.add('text-espn-red', 'bg-espn-card');
+
+      // Update Mobile Carousel Buttons
+      document.querySelectorAll('.m-nav-btn').forEach(btn => {
+        btn.classList.remove('bg-espn-card', 'text-white', 'text-espn-red');
+        btn.classList.add('bg-black', 'text-gray-400');
+      });
+      const activeMNav = document.getElementById('m-nav-' + tabId);
+      if (activeMNav) {
+        activeMNav.classList.remove('bg-black', 'text-gray-400');
+        activeMNav.classList.add('bg-espn-card', 'text-white');
+      }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -751,37 +699,25 @@
       menu.classList.toggle('hidden');
     }
 
-    // USER & ADMIN CONTROLS
     function renderUserHeader() {
       const container = document.getElementById('userInfo');
       if (currentUser) {
         const isCommish = isAdmin();
-        const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
         container.innerHTML = `
-          <div class="flex items-center gap-2 bg-black px-3 py-1 rounded-full border border-espn-border">
-            <div class="w-7 h-7 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-xs text-white shadow">
-              ${initials}
-            </div>
-            <div class="text-left hidden sm:block">
-              <span class="text-xs font-bold text-white block leading-none">${currentUser.name}</span>
-              ${isCommish ? '<span class="text-[9px] text-espn-gold font-black uppercase">COMMISSIONER</span>' : '<span class="text-[9px] text-gray-400 font-semibold">MEMBER</span>'}
-            </div>
-            <button onclick="logoutUser()" title="Sign Out" class="text-gray-400 hover:text-white ml-1 text-xs">
-              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
+          <button onclick="logoutUser()" class="flex items-center gap-1.5 bg-black px-2.5 py-1 rounded-full border border-espn-border text-xs">
+            <span class="w-5 h-5 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-[10px] text-white">
+              ${currentUser.name.charAt(0).toUpperCase()}
+            </span>
+            <span class="text-white font-bold max-w-[80px] truncate text-[11px]">${currentUser.name}</span>
+          </button>
         `;
       } else {
         container.innerHTML = `
-          <button onclick="openAuthModal()" class="bg-espn-red hover:bg-espn-darkRed text-white text-xs font-bold px-3 py-1.5 rounded-lg transition uppercase tracking-wider">
-            Sign In / Join
-          </button>
-          <button onclick="quickAdminLogin()" class="bg-black hover:bg-espn-card text-espn-gold border border-espn-gold/50 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition">
-            Commish Login
+          <button onclick="openAuthModal()" class="bg-espn-red text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+            Sign In
           </button>
         `;
       }
-      lucide.createIcons();
     }
 
     function renderAdminElements() {
@@ -807,24 +743,10 @@
       e.preventDefault();
       const username = document.getElementById('authUsername').value.trim();
       const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value;
-
       if (!username || !email) return;
 
-      saveUser({ 
-        name: username, 
-        email: email,
-        authenticated: true 
-      });
+      saveUser({ name: username, email: email, authenticated: true });
       closeAuthModal();
-    }
-
-    function quickAdminLogin() {
-      saveUser({ 
-        name: 'Hunter Pillon (Commish)', 
-        email: ADMIN_EMAIL,
-        authenticated: true
-      });
     }
 
     function logoutUser() {
@@ -833,9 +755,7 @@
       renderAll();
     }
 
-    // DASHBOARD RENDER
     function renderDashboard() {
-      // Standings preview
       const standingsBody = document.getElementById('dashStandingsBody');
       const sorted = [...appData.standings].sort((a, b) => (b.w / (b.w + b.l || 1)) - (a.w / (a.w + a.l || 1)));
       standingsBody.innerHTML = sorted.slice(0, 4).map(s => {
@@ -845,9 +765,9 @@
         const diff = s.pf - s.pa;
         return `
           <tr class="hover:bg-espn-card">
-            <td class="py-2 flex items-center gap-2 font-bold text-white">
+            <td class="py-2 flex items-center gap-1.5 font-bold text-white truncate">
               <span>${team ? team.logo : ''}</span>
-              <span>${team ? team.name : ''}</span>
+              <span class="truncate">${team ? team.name : ''}</span>
             </td>
             <td class="text-center font-semibold text-gray-300">${s.w}</td>
             <td class="text-center font-semibold text-gray-300">${s.l}</td>
@@ -857,18 +777,16 @@
         `;
       }).join('');
 
-      // Power Rankings
       const prContainer = document.getElementById('dashPowerRankings');
       const prSorted = [...appData.powerRankings].sort((a, b) => a.rank - b.rank);
       prContainer.innerHTML = prSorted.slice(0, 3).map(pr => {
         const team = appData.teams.find(t => t.id === pr.teamId);
         return `
           <div class="flex items-center justify-between p-2 bg-black/40 rounded border border-espn-border text-xs">
-            <div class="flex items-center gap-3">
-              <span class="font-display font-black text-lg text-espn-red">#${pr.rank}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-black text-base text-espn-red">#${pr.rank}</span>
               <div>
-                <p class="font-bold text-white">${team ? team.name : ''}</p>
-                <p class="text-[10px] text-gray-400">${pr.summary}</p>
+                <p class="font-bold text-white text-xs">${team ? team.name : ''}</p>
               </div>
             </div>
             <span class="text-[10px] font-bold text-gray-400">${pr.change}</span>
@@ -876,80 +794,65 @@
         `;
       }).join('');
 
-      // Leaders Preview
       const tdLeaders = [...appData.players].sort((a, b) => b.td - a.td).slice(0, 3);
       document.getElementById('dashTdLeaders').innerHTML = tdLeaders.map(p => `
         <div class="flex justify-between text-xs">
-          <span class="text-gray-300 font-medium">${p.name}</span>
-          <span class="font-bold text-espn-gold">${p.td} TD</span>
+          <span class="text-gray-300 truncate mr-1">${p.name}</span>
+          <span class="font-bold text-espn-gold shrink-0">${p.td} TD</span>
         </div>
       `).join('');
 
       const intLeaders = [...appData.players].sort((a, b) => b.int - a.int).slice(0, 3);
       document.getElementById('dashIntLeaders').innerHTML = intLeaders.map(p => `
         <div class="flex justify-between text-xs">
-          <span class="text-gray-300 font-medium">${p.name}</span>
-          <span class="font-bold text-espn-red">${p.int} INT</span>
+          <span class="text-gray-300 truncate mr-1">${p.name}</span>
+          <span class="font-bold text-espn-red shrink-0">${p.int} INT</span>
         </div>
       `).join('');
     }
 
-    // SCHEDULE RENDER
     function renderSchedule() {
       const container = document.getElementById('scheduleContainer');
       container.innerHTML = appData.games.map(g => {
         const home = appData.teams.find(t => t.id === g.homeId);
         const away = appData.teams.find(t => t.id === g.awayId);
         return `
-          <div class="bg-espn-card border border-espn-border rounded-xl p-5 shadow-lg relative">
-            <div class="flex justify-between items-center text-xs text-gray-400 mb-3 pb-2 border-b border-espn-border">
-              <span class="flex items-center gap-1 font-bold text-espn-gold">
-                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> ${g.field}
-              </span>
+          <div class="bg-espn-card border border-espn-border rounded-xl p-4 shadow-lg">
+            <div class="flex justify-between items-center text-[11px] text-gray-400 mb-2 pb-2 border-b border-espn-border">
+              <span class="font-bold text-espn-gold">${g.field}</span>
               <span>${g.date}</span>
             </div>
-
-            <div class="space-y-3">
-              <!-- Away -->
+            <div class="space-y-2">
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <span class="text-xl">${away ? away.logo : ''}</span>
-                  <span class="font-bold text-white text-base">${away ? away.name : 'TBD'}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">${away ? away.logo : ''}</span>
+                  <span class="font-bold text-white text-sm">${away ? away.name : 'TBD'}</span>
                 </div>
-                <span class="text-2xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">
+                <span class="text-xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">
                   ${g.status === 'UPCOMING' ? '-' : g.awayScore}
                 </span>
               </div>
-
-              <!-- Home -->
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <span class="text-xl">${home ? home.logo : ''}</span>
-                  <span class="font-bold text-white text-base">${home ? home.name : 'TBD'}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">${home ? home.logo : ''}</span>
+                  <span class="font-bold text-white text-sm">${home ? home.name : 'TBD'}</span>
                 </div>
-                <span class="text-2xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">
+                <span class="text-xl font-black ${g.status === 'UPCOMING' ? 'text-gray-600' : 'text-white'}">
                   ${g.status === 'UPCOMING' ? '-' : g.homeScore}
                 </span>
               </div>
             </div>
-
-            <div class="mt-4 pt-3 border-t border-espn-border flex justify-between items-center">
-              <span class="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded ${g.status === 'LIVE' ? 'bg-espn-red text-white animate-pulse' : 'bg-black text-gray-400'}">
+            <div class="mt-3 pt-2 border-t border-espn-border flex justify-between items-center">
+              <span class="text-[9px] uppercase font-black px-2 py-0.5 rounded ${g.status === 'LIVE' ? 'bg-espn-red text-white animate-pulse' : 'bg-black text-gray-400'}">
                 ${g.status}
               </span>
-              ${isAdmin() ? `
-                <button onclick="editGameScore('${g.id}')" class="text-xs text-espn-red font-bold hover:underline">
-                  Update Score / Field
-                </button>
-              ` : ''}
+              ${isAdmin() ? `<button onclick="editGameScore('${g.id}')" class="text-xs text-espn-red font-bold">Edit</button>` : ''}
             </div>
           </div>
         `;
       }).join('');
-      lucide.createIcons();
     }
 
-    // STANDINGS RENDER
     function renderStandings() {
       const container = document.getElementById('fullStandingsBody');
       const sorted = [...appData.standings].sort((a, b) => (b.w / (b.w + b.l || 1)) - (a.w / (a.w + a.l || 1)));
@@ -959,31 +862,29 @@
         const pct = total > 0 ? (s.w / total).toFixed(3).replace('0.', '.') : '.000';
         const diff = s.pf - s.pa;
         return `
-          <tr class="hover:bg-black/30 transition">
-            <td class="p-4 font-bold text-white flex items-center gap-3">
-              <span class="text-espn-gold font-black w-4 text-center">${idx + 1}</span>
-              <span class="text-xl">${team ? team.logo : ''}</span>
+          <tr class="hover:bg-black/30">
+            <td class="p-3 font-bold text-white flex items-center gap-2">
+              <span class="text-espn-gold font-black text-xs">${idx + 1}</span>
+              <span>${team ? team.logo : ''}</span>
               <span>${team ? team.name : ''}</span>
             </td>
-            <td class="p-4 text-center font-bold text-white">${s.w}</td>
-            <td class="p-4 text-center font-bold text-white">${s.l}</td>
-            <td class="p-4 text-center font-bold text-white">${s.t}</td>
-            <td class="p-4 text-center font-black text-espn-gold">${pct}</td>
-            <td class="p-4 text-center font-mono text-gray-300">${s.pf}</td>
-            <td class="p-4 text-center font-mono text-gray-300">${s.pa}</td>
-            <td class="p-4 text-center font-mono font-bold ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
-            <td class="p-4 text-center font-bold text-espn-red">${s.streak}</td>
+            <td class="p-3 text-center font-bold text-white">${s.w}</td>
+            <td class="p-3 text-center font-bold text-white">${s.l}</td>
+            <td class="p-3 text-center font-bold text-white">${s.t}</td>
+            <td class="p-3 text-center font-black text-espn-gold">${pct}</td>
+            <td class="p-3 text-center font-mono text-gray-300">${s.pf}</td>
+            <td class="p-3 text-center font-mono text-gray-300">${s.pa}</td>
+            <td class="p-3 text-center font-mono font-bold ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
           </tr>
         `;
       }).join('');
     }
 
-    // TEAMS RENDER
     let selectedTeamId = 't1';
     function renderTeams() {
       const selector = document.getElementById('teamSelectorList');
       selector.innerHTML = appData.teams.map(t => `
-        <button onclick="selectTeam('${t.id}')" class="px-4 py-2 rounded-xl border text-xs font-bold transition flex items-center gap-2 shrink-0 ${selectedTeamId === t.id ? 'bg-espn-red text-white border-espn-red shadow-lg' : 'bg-espn-card text-gray-300 border-espn-border hover:border-gray-500'}">
+        <button onclick="selectTeam('${t.id}')" class="px-3 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 shrink-0 ${selectedTeamId === t.id ? 'bg-espn-red text-white border-espn-red' : 'bg-espn-card text-gray-300 border-espn-border'}">
           <span>${t.logo}</span>
           <span>${t.name}</span>
         </button>
@@ -994,46 +895,41 @@
 
       const view = document.getElementById('activeTeamView');
       view.innerHTML = `
-        <div class="bg-espn-card border border-espn-border rounded-xl p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div class="flex items-center gap-4">
-            <div class="text-5xl bg-black p-4 rounded-xl border border-espn-border shadow-inner">${activeTeam.logo}</div>
+        <div class="bg-espn-card border border-espn-border rounded-xl p-4 shadow-xl flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl bg-black p-2.5 rounded-xl border border-espn-border">${activeTeam.logo}</div>
             <div>
-              <h3 class="font-display font-black text-3xl text-white">${activeTeam.name}</h3>
+              <h3 class="font-display font-black text-xl text-white">${activeTeam.name}</h3>
               <p class="text-xs text-espn-gold font-bold">RECORD: ${activeTeam.record}</p>
             </div>
           </div>
-          ${isAdmin() ? `
-            <button onclick="openAdminModal('addPlayer', '${activeTeam.id}')" class="bg-espn-red text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-espn-darkRed transition flex items-center gap-1">
-              <i data-lucide="user-plus" class="w-4 h-4"></i> Add Player
-            </button>
-          ` : ''}
         </div>
 
         <div class="bg-espn-card rounded-xl border border-espn-border overflow-hidden shadow-xl">
-          <div class="p-4 bg-black/40 border-b border-espn-border font-bold text-xs uppercase text-gray-400">
-            Active Roster (${teamPlayers.length} Players)
+          <div class="p-3 bg-black/40 border-b border-espn-border font-bold text-xs uppercase text-gray-400">
+            Roster (${teamPlayers.length} Players)
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-black text-gray-400 text-xs uppercase border-b border-espn-border">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-black text-gray-400 text-[10px] uppercase border-b border-espn-border">
                 <tr>
-                  <th class="p-3">#</th>
-                  <th class="p-3">Player Name</th>
-                  <th class="p-3">Position</th>
-                  <th class="p-3 text-center">TD</th>
-                  <th class="p-3 text-center">INT</th>
-                  <th class="p-3 text-center">Sacks</th>
+                  <th class="p-2.5">#</th>
+                  <th class="p-2.5">Name</th>
+                  <th class="p-2.5">Pos</th>
+                  <th class="p-2.5 text-center">TD</th>
+                  <th class="p-2.5 text-center">INT</th>
+                  <th class="p-2.5 text-center">Sacks</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-espn-border">
                 ${teamPlayers.map(p => `
-                  <tr class="hover:bg-black/30">
-                    <td class="p-3 font-mono font-bold text-espn-red">#${p.number}</td>
-                    <td class="p-3 font-bold text-white">${p.name}</td>
-                    <td class="p-3 text-xs text-gray-400">${p.pos}</td>
-                    <td class="p-3 text-center font-bold text-espn-gold">${p.td || 0}</td>
-                    <td class="p-3 text-center font-bold text-espn-red">${p.int || 0}</td>
-                    <td class="p-3 text-center text-gray-300">${p.sacks || 0}</td>
+                  <tr>
+                    <td class="p-2.5 font-mono font-bold text-espn-red">#${p.number}</td>
+                    <td class="p-2.5 font-bold text-white">${p.name}</td>
+                    <td class="p-2.5 text-[11px] text-gray-400">${p.pos}</td>
+                    <td class="p-2.5 text-center font-bold text-espn-gold">${p.td || 0}</td>
+                    <td class="p-2.5 text-center font-bold text-espn-red">${p.int || 0}</td>
+                    <td class="p-2.5 text-center text-gray-300">${p.sacks || 0}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -1041,7 +937,6 @@
           </div>
         </div>
       `;
-      lucide.createIcons();
     }
 
     function selectTeam(teamId) {
@@ -1049,7 +944,6 @@
       renderTeams();
     }
 
-    // STATS RENDER
     function renderStats() {
       const container = document.getElementById('playerStatsTableBody');
       const sorted = [...appData.players].sort((a, b) => (b[currentStatSort] || 0) - (a[currentStatSort] || 0));
@@ -1057,15 +951,17 @@
       container.innerHTML = sorted.map(p => {
         const team = appData.teams.find(t => t.id === p.teamId);
         return `
-          <tr class="hover:bg-black/30 transition">
-            <td class="p-4 font-bold text-white flex items-center gap-2">
-              <span class="text-espn-red font-mono text-xs">#${p.number}</span>
-              <span>${p.name}</span>
+          <tr class="hover:bg-black/30">
+            <td class="p-3 font-bold text-white">
+              <div class="flex items-center gap-1.5">
+                <span class="text-espn-red font-mono text-xs">#${p.number}</span>
+                <span>${p.name}</span>
+              </div>
+              <span class="text-[10px] text-gray-400 font-normal block">${team ? team.name : ''}</span>
             </td>
-            <td class="p-4 text-xs font-semibold text-gray-400">${team ? team.name : ''}</td>
-            <td class="p-4 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
-            <td class="p-4 text-center font-black text-espn-red text-base">${p.int || 0}</td>
-            <td class="p-4 text-center font-mono font-bold text-gray-300 text-base">${p.sacks || 0}</td>
+            <td class="p-3 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
+            <td class="p-3 text-center font-black text-espn-red text-base">${p.int || 0}</td>
+            <td class="p-3 text-center font-mono font-bold text-gray-300 text-base">${p.sacks || 0}</td>
           </tr>
         `;
       }).join('');
@@ -1076,10 +972,8 @@
       renderStats();
     }
 
-    // PLAYOFFS RENDER
     function renderPlayoffs() {
       const po = appData.playoffs;
-      
       const renderMatch = (match) => {
         const home = appData.teams.find(t => t.id === match.homeId);
         const away = appData.teams.find(t => t.id === match.awayId);
@@ -1095,27 +989,23 @@
         `;
       };
 
-      document.getElementById('bracket-semi1').innerHTML = renderMatch(po.semi1);
-      document.getElementById('bracket-semi2').innerHTML = renderMatch(po.semi2);
-      document.getElementById('bracket-championship').innerHTML = renderMatch(po.championship);
+      document.getElementById('m-bracket-semi1').innerHTML = renderMatch(po.semi1);
+      document.getElementById('m-bracket-semi2').innerHTML = renderMatch(po.semi2);
+      document.getElementById('m-bracket-championship').innerHTML = renderMatch(po.championship);
 
       const winnerTeam = appData.teams.find(t => t.id === po.championship.winnerId);
-      document.getElementById('bracketWinnerName').innerText = winnerTeam ? `${winnerTeam.logo} ${winnerTeam.name}` : 'TBD';
+      document.getElementById('m-bracketWinnerName').innerText = winnerTeam ? `${winnerTeam.logo} ${winnerTeam.name}` : 'TBD';
     }
 
-    // NEWS RENDER
     function renderNews() {
       const feed = document.getElementById('newsFeedContainer');
       feed.innerHTML = appData.news.map(item => `
-        <div class="bg-espn-card border border-espn-border rounded-xl overflow-hidden shadow-xl flex flex-col md:flex-row gap-4 p-4">
-          <img src="${item.image}" alt="${item.headline}" class="w-full md:w-48 h-36 object-cover rounded-lg shrink-0">
-          <div class="flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-bold uppercase text-espn-red tracking-wider">${item.date}</span>
-              <h3 class="font-display font-black text-lg text-white mt-1 leading-snug">${item.headline}</h3>
-              <p class="text-xs text-espn-gold font-semibold mt-1">${item.tagline}</p>
-              <p class="text-xs text-gray-300 mt-2 line-clamp-2">${item.content}</p>
-            </div>
+        <div class="bg-espn-card border border-espn-border rounded-xl overflow-hidden shadow-xl p-3 flex flex-col sm:flex-row gap-3">
+          <img src="${item.image}" alt="${item.headline}" class="w-full sm:w-36 h-32 object-cover rounded-lg">
+          <div>
+            <span class="text-[9px] font-bold uppercase text-espn-red">${item.date}</span>
+            <h3 class="font-display font-black text-sm sm:text-base text-white mt-0.5">${item.headline}</h3>
+            <p class="text-xs text-gray-300 mt-1 line-clamp-2">${item.content}</p>
           </div>
         </div>
       `).join('');
@@ -1124,21 +1014,19 @@
       prList.innerHTML = appData.powerRankings.map(pr => {
         const team = appData.teams.find(t => t.id === pr.teamId);
         return `
-          <div class="p-3 bg-black/50 border border-espn-border rounded-lg flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="font-display font-black text-xl text-espn-red">#${pr.rank}</span>
+          <div class="p-2.5 bg-black/50 border border-espn-border rounded-lg flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-display font-black text-base text-espn-red">#${pr.rank}</span>
               <div>
-                <p class="font-bold text-white text-sm">${team ? team.name : 'Team'}</p>
-                <p class="text-xs text-gray-400">${pr.summary}</p>
+                <p class="font-bold text-white">${team ? team.name : ''}</p>
               </div>
             </div>
-            <span class="text-xs font-bold text-espn-gold">${pr.change}</span>
+            <span class="text-[10px] font-bold text-espn-gold">${pr.change}</span>
           </div>
         `;
       }).join('');
     }
 
-    // CHAT ROOM RENDER
     function renderChat() {
       const container = document.getElementById('chatMessages');
       const authPrompt = document.getElementById('chatAuthPrompt');
@@ -1155,15 +1043,14 @@
       container.innerHTML = appData.chat.map(msg => {
         const isCommish = msg.user.toLowerCase() === ADMIN_EMAIL.toLowerCase();
         return `
-          <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-xs text-white shrink-0 shadow">
+          <div class="flex items-start gap-2">
+            <div class="w-7 h-7 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-[10px] text-white shrink-0">
               ${msg.name.charAt(0).toUpperCase()}
             </div>
-            <div class="bg-black/60 border border-espn-border rounded-xl p-3 max-w-xl">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="font-bold text-xs text-white">${msg.name}</span>
-                ${isCommish ? '<span class="bg-espn-red text-white text-[9px] font-black px-1.5 py-0.2 rounded uppercase">COMMISH</span>' : ''}
-                <span class="text-[10px] text-gray-500">${msg.timestamp}</span>
+            <div class="bg-black/60 border border-espn-border rounded-xl p-2.5 max-w-xs">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="font-bold text-[11px] text-white">${msg.name}</span>
+                ${isCommish ? '<span class="bg-espn-red text-white text-[8px] font-black px-1 rounded uppercase">COMMISH</span>' : ''}
               </div>
               <p class="text-xs text-gray-200">${msg.text}</p>
             </div>
@@ -1196,28 +1083,18 @@
       saveData();
     }
 
-    // HALL OF FAME RENDER
     function renderHof() {
       const container = document.getElementById('hofGridContainer');
       const filtered = appData.hof.filter(h => currentHofFilter === 'all' || h.type === currentHofFilter);
 
       container.innerHTML = filtered.map(item => `
-        <div class="bg-gradient-to-b from-espn-card to-black border border-espn-gold/40 rounded-xl p-5 shadow-xl relative overflow-hidden group">
-          <div class="absolute top-0 right-0 bg-espn-gold/20 text-espn-gold text-[10px] font-black uppercase px-3 py-1 rounded-bl">
-            ${item.type.toUpperCase()}
-          </div>
-          <div class="flex items-center gap-3 mb-3">
-            <i data-lucide="award" class="text-espn-gold w-6 h-6 shrink-0"></i>
-            <div>
-              <h3 class="font-display font-black text-lg text-white">${item.name}</h3>
-              <p class="text-xs font-bold text-espn-gold">${item.title}</p>
-            </div>
-          </div>
-          <p class="text-xs text-gray-300 mb-3">${item.desc}</p>
-          <span class="text-[10px] font-mono text-gray-500">${item.year}</span>
+        <div class="bg-gradient-to-b from-espn-card to-black border border-espn-gold/40 rounded-xl p-4 shadow-xl relative">
+          <span class="text-espn-gold text-[9px] font-black uppercase tracking-wider block mb-1">${item.type.toUpperCase()}</span>
+          <h3 class="font-display font-black text-base text-white">${item.name}</h3>
+          <p class="text-xs font-bold text-espn-gold mt-0.5">${item.title}</p>
+          <p class="text-xs text-gray-300 mt-2">${item.desc}</p>
         </div>
       `).join('');
-      lucide.createIcons();
     }
 
     function filterHof(type) {
@@ -1225,21 +1102,16 @@
       renderHof();
     }
 
-    // ADMIN MODAL & ACTIONS
-    function openAdminModal(action, extraData = null) {
-      if (!isAdmin()) {
-        alert("Only Commissioner (hpillon77@gmail.com) can edit league data.");
-        return;
-      }
-
+    function openAdminModal(action) {
+      if (!isAdmin()) return;
       const modal = document.getElementById('adminModal');
       const content = document.getElementById('adminModalContent');
       modal.classList.remove('hidden');
 
       if (action === 'addGame') {
         content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">ADD NEW GAME</h3>
-          <form onsubmit="saveNewGame(event)" class="space-y-4 text-xs">
+          <h3 class="font-display font-black text-base text-white mb-3">ADD GAME</h3>
+          <form onsubmit="saveNewGame(event)" class="space-y-3 text-xs">
             <div>
               <label class="block font-bold text-gray-300 mb-1">Away Team</label>
               <select id="admAway" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
@@ -1253,87 +1125,14 @@
               </select>
             </div>
             <div>
-              <label class="block font-bold text-gray-300 mb-1">Field Location</label>
-              <select id="admField" class="w-full bg-black border border-espn-border p-2 rounded text-white">
-                <option value="Field 1 - South Lawn">Field 1 - South Lawn</option>
-                <option value="Field 2 - Backyard Arena">Field 2 - Backyard Arena</option>
-                <option value="Field 3 - North Pitch">Field 3 - North Pitch</option>
-              </select>
+              <label class="block font-bold text-gray-300 mb-1">Field</label>
+              <input type="text" id="admField" value="Field 1" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
             </div>
             <div>
               <label class="block font-bold text-gray-300 mb-1">Date</label>
-              <input type="text" id="admDate" value="Nov 16, 2026" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
+              <input type="text" id="admDate" value="Nov 16" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
             </div>
             <button type="submit" class="w-full bg-espn-red text-white font-bold py-2 rounded">Save Game</button>
-          </form>
-        `;
-      } else if (action === 'editStandings') {
-        content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">EDIT STANDINGS</h3>
-          <form onsubmit="saveStandings(event)" class="space-y-3 text-xs">
-            ${appData.standings.map(s => {
-              const t = appData.teams.find(tm => tm.id === s.teamId);
-              return `
-                <div class="bg-black p-3 rounded border border-espn-border flex flex-wrap gap-2 items-center justify-between">
-                  <span class="font-bold text-white w-28">${t ? t.name : ''}</span>
-                  <div class="flex gap-2">
-                    <label>W: <input type="number" id="w_${s.teamId}" value="${s.w}" class="w-12 bg-espn-card border p-1 text-center rounded"></label>
-                    <label>L: <input type="number" id="l_${s.teamId}" value="${s.l}" class="w-12 bg-espn-card border p-1 text-center rounded"></label>
-                    <label>PF: <input type="number" id="pf_${s.teamId}" value="${s.pf}" class="w-12 bg-espn-card border p-1 text-center rounded"></label>
-                    <label>PA: <input type="number" id="pa_${s.teamId}" value="${s.pa}" class="w-12 bg-espn-card border p-1 text-center rounded"></label>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-            <button type="submit" class="w-full bg-espn-red text-white font-bold py-2 rounded mt-2">Update Standings</button>
-          </form>
-        `;
-      } else if (action === 'editPlayerStats') {
-        content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">MANAGE PLAYER STATS</h3>
-          <div class="max-h-96 overflow-y-auto space-y-3 text-xs pr-2 custom-scrollbar">
-            ${appData.players.map(p => `
-              <div class="bg-black p-3 rounded border border-espn-border space-y-2">
-                <p class="font-bold text-espn-gold">${p.name} (#${p.number})</p>
-                <div class="grid grid-cols-3 gap-2">
-                  <label>Touchdowns (TD): <input type="number" id="p_td_${p.id}" value="${p.td || 0}" class="w-full bg-espn-card border p-1.5 rounded text-white font-bold"></label>
-                  <label>Interceptions (INT): <input type="number" id="p_int_${p.id}" value="${p.int || 0}" class="w-full bg-espn-card border p-1.5 rounded text-white font-bold"></label>
-                  <label>Sacks: <input type="number" id="p_sack_${p.id}" value="${p.sacks || 0}" class="w-full bg-espn-card border p-1.5 rounded text-white font-bold"></label>
-                  <button onclick="updateSinglePlayerStat('${p.id}')" class="col-span-3 bg-espn-red text-white font-bold py-1.5 rounded mt-1 text-xs hover:bg-espn-darkRed transition">Save Stats for ${p.name}</button>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      } else if (action === 'addHof') {
-        content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">INDUCT INTO HALL OF FAME</h3>
-          <form onsubmit="saveHof(event)" class="space-y-4 text-xs">
-            <div>
-              <label class="block font-bold text-gray-300 mb-1">Type</label>
-              <select id="hofType" class="w-full bg-black border border-espn-border p-2 rounded text-white">
-                <option value="player">Player</option>
-                <option value="team">Team</option>
-                <option value="award">Award / Historic Title</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-bold text-gray-300 mb-1">Name</label>
-              <input type="text" id="hofName" placeholder="e.g. Hunter Pillon" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
-            </div>
-            <div>
-              <label class="block font-bold text-gray-300 mb-1">Title / Honor</label>
-              <input type="text" id="hofTitle" placeholder="e.g. All-Time TD Leader" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
-            </div>
-            <div>
-              <label class="block font-bold text-gray-300 mb-1">Year / Season</label>
-              <input type="text" id="hofYear" placeholder="e.g. Class of 2026" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
-            </div>
-            <div>
-              <label class="block font-bold text-gray-300 mb-1">Description</label>
-              <textarea id="hofDesc" rows="3" class="w-full bg-black border border-espn-border p-2 rounded text-white" required></textarea>
-            </div>
-            <button type="submit" class="w-full bg-espn-gold text-black font-black py-2 rounded uppercase">Induct Legend</button>
           </form>
         `;
       }
@@ -1350,8 +1149,8 @@
       openAdminModal('general');
       const content = document.getElementById('adminModalContent');
       content.innerHTML = `
-        <h3 class="font-display font-black text-xl text-white mb-4">UPDATE GAME SCORE & FIELD</h3>
-        <form onsubmit="saveGameScore(event, '${game.id}')" class="space-y-4 text-xs">
+        <h3 class="font-display font-black text-base text-white mb-3">UPDATE SCORE</h3>
+        <form onsubmit="saveGameScore(event, '${game.id}')" class="space-y-3 text-xs">
           <div>
             <label class="block font-bold text-gray-300 mb-1">Away Score</label>
             <input type="number" id="editAwayScore" value="${game.awayScore}" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
@@ -1368,10 +1167,6 @@
               <option value="FINAL" ${game.status === 'FINAL' ? 'selected' : ''}>FINAL</option>
             </select>
           </div>
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Field Location</label>
-            <input type="text" id="editFieldLoc" value="${game.field}" class="w-full bg-black border border-espn-border p-2 rounded text-white" required>
-          </div>
           <button type="submit" class="w-full bg-espn-red text-white font-bold py-2 rounded">Save Changes</button>
         </form>
       `;
@@ -1384,7 +1179,6 @@
         game.awayScore = parseInt(document.getElementById('editAwayScore').value) || 0;
         game.homeScore = parseInt(document.getElementById('editHomeScore').value) || 0;
         game.status = document.getElementById('editStatus').value;
-        game.field = document.getElementById('editFieldLoc').value;
         saveData();
         closeAdminModal();
       }
@@ -1401,52 +1195,6 @@
         awayScore: 0,
         homeScore: 0,
         status: 'UPCOMING'
-      });
-      saveData();
-      closeAdminModal();
-    }
-
-    function saveStandings(e) {
-      e.preventDefault();
-      appData.standings.forEach(s => {
-        s.w = parseInt(document.getElementById(`w_${s.teamId}`).value) || 0;
-        s.l = parseInt(document.getElementById(`l_${s.teamId}`).value) || 0;
-        s.pf = parseInt(document.getElementById(`pf_${s.teamId}`).value) || 0;
-        s.pa = parseInt(document.getElementById(`pa_${s.teamId}`).value) || 0;
-      });
-      saveData();
-      closeAdminModal();
-    }
-
-    function updateSinglePlayerStat(playerId) {
-      const p = appData.players.find(pl => pl.id === playerId);
-      if (p) {
-        p.td = parseInt(document.getElementById(`p_td_${p.id}`).value) || 0;
-        p.int = parseInt(document.getElementById(`p_int_${p.id}`).value) || 0;
-        p.sacks = parseInt(document.getElementById(`p_sack_${p.id}`).value) || 0;
-        
-        // Clean up any legacy stat keys
-        delete p.passTd;
-        delete p.rushTd;
-        delete p.recTd;
-        delete p.tackles;
-        delete p.passYds;
-        delete p.rushYds;
-
-        saveData();
-        alert(`Updated stats for ${p.name}`);
-      }
-    }
-
-    function saveHof(e) {
-      e.preventDefault();
-      appData.hof.push({
-        id: 'h_' + Date.now(),
-        type: document.getElementById('hofType').value,
-        name: document.getElementById('hofName').value,
-        title: document.getElementById('hofTitle').value,
-        year: document.getElementById('hofYear').value,
-        desc: document.getElementById('hofDesc').value
       });
       saveData();
       closeAdminModal();
