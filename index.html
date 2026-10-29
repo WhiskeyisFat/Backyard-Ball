@@ -547,21 +547,23 @@
 
         userId = auth.currentUser?.uid || crypto.randomUUID();
         
+        // REAL-TIME CLOUD SYNC LISTENER
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
         onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             window.appData = docSnap.data();
             localStorage.setItem('byb_local_league_cache', JSON.stringify(window.appData));
+            renderAll();
           } else {
-            setDoc(docRef, initialData);
-            window.appData = initialData;
+            setDoc(docRef, initialData).catch(() => {});
           }
-          renderAll();
         }, (err) => {
           console.warn("Firestore sync fallback to local cache:", err);
           const cached = localStorage.getItem('byb_local_league_cache');
-          if (cached) window.appData = JSON.parse(cached);
-          renderAll();
+          if (cached) {
+            window.appData = JSON.parse(cached);
+            renderAll();
+          }
         });
 
       } catch (e) {
@@ -581,7 +583,7 @@
       if (!db) return;
       try {
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
-        await setDoc(docRef, window.appData);
+        await setDoc(docRef, window.appData, { merge: true });
       } catch (e) {
         console.error("Error saving data to cloud:", e);
       }
