@@ -586,20 +586,16 @@
       try {
         localStorage.setItem('byb_permanent_league_data_v2', JSON.stringify(window.appData));
 
+        if (!db && typeof firebase !== 'undefined' && firebase.apps.length) {
+          db = firebase.firestore();
+        }
+
         if (db) {
           const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data');
           await docRef.set({ payload: window.appData });
-          showToast("Changes saved globally to cloud & synced across all devices!");
+          showToast("Changes saved globally! Updated for everyone across all devices.");
         } else {
-          // Attempt instant fallback connection if db wasn't initialized yet
-          if (typeof firebase !== 'undefined' && firebase.apps.length) {
-            db = firebase.firestore();
-            const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data');
-            await docRef.set({ payload: window.appData });
-            showToast("Changes saved globally to cloud & synced across all devices!");
-          } else {
-            showToast("Changes saved locally! (Cloud offline - connect to internet)");
-          }
+          showToast("Changes saved locally! (Cloud offline - connect to internet)");
         }
         renderAll();
       } catch (e) {
@@ -610,8 +606,13 @@
 
     window.saveData = function() {
       renderAll();
-      if (window.isAdmin() && db) {
-        db.collection('artifacts').doc(APP_ID).collection('public').doc('data').set({ payload: window.appData }).catch(err => console.log(err));
+      if (window.isAdmin()) {
+        if (!db && typeof firebase !== 'undefined' && firebase.apps.length) {
+          db = firebase.firestore();
+        }
+        if (db) {
+          db.collection('artifacts').doc(APP_ID).collection('public').doc('data').set({ payload: window.appData }).catch(err => console.log(err));
+        }
       }
     };
 
@@ -653,7 +654,6 @@
     window.onload = function() {
       lucide.createIcons();
       initFirebase();
-      // Load local cache initially while cloud connects
       const localSaved = localStorage.getItem('byb_permanent_league_data_v2');
       if (localSaved) {
         try { window.appData = JSON.parse(localSaved); } catch(e){}
