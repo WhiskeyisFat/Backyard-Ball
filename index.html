@@ -81,7 +81,7 @@
 
         <!-- NAV TABS (Desktop) -->
         <nav class="hidden lg:flex space-x-1.5 font-bold text-xs uppercase tracking-wider">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition">Dashboard</button>
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition text-espn-red bg-espn-card">Dashboard</button>
           <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition">Schedule</button>
           <button onclick="switchTab('standings')" id="nav-standings" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition">Standings</button>
           <button onclick="switchTab('teams')" id="nav-teams" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition">Teams</button>
@@ -96,8 +96,13 @@
           </button>
         </nav>
 
-        <!-- USER & MOBILE MENU BTN -->
+        <!-- USER, SAVE & MOBILE MENU BTN -->
         <div class="flex items-center space-x-2">
+          <!-- Permanent Save Button for Admin -->
+          <button id="adminSavePermanentBtn" onclick="savePermanentChanges()" class="hidden bg-green-600 hover:bg-green-700 text-white font-black text-xs px-3 py-2 rounded-xl shadow flex items-center gap-1 transition animate-pulse">
+            <i data-lucide="save" class="w-4 h-4"></i> Save Changes
+          </button>
+
           <div id="userInfo" class="flex items-center gap-2">
             <!-- Rendered dynamically -->
           </div>
@@ -138,6 +143,12 @@
 
   <!-- MAIN CONTENT CONTAINER -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-green-600 text-white font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-5 h-5"></i>
+      <span id="toastMessage">Changes Saved Successfully!</span>
+    </div>
 
     <!-- TAB 1: DASHBOARD -->
     <div id="tab-dashboard" class="tab-content space-y-5">
@@ -441,23 +452,9 @@
     </div>
   </div>
 
-  <!-- FIREBASE SDKS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'backyard-ball-league';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-      apiKey: "demo-key",
-      authDomain: "demo.firebaseapp.com",
-      projectId: "demo-project",
-      storageBucket: "demo.appspot.com",
-      messagingSenderId: "123456",
-      appId: "1:123:web:abc"
-    };
-
-    let app, db, auth, userId = null;
+  <!-- APP LOGIC -->
+  <script>
+    const STORAGE_DATA_KEY = 'byb_permanent_league_data_v2';
     const USERS_DB_KEY = 'byb_registered_users_db';
     const CURRENT_USER_KEY = 'byb_active_user_session';
     const ADMIN_EMAIL = 'hpillon77@gmail.com';
@@ -523,65 +520,50 @@
       ]
     };
 
-    window.appData = defaultAppData;
-    window.currentUser = null;
+    window.appData = loadStoredData();
+    window.currentUser = loadUserSession();
     window.currentTab = 'dashboard';
     window.currentStatSort = 'td';
     window.currentHofFilter = 'all';
     window.selectedTeamId = 't1';
 
-    async function initFirebase() {
+    function loadStoredData() {
       try {
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
+        const saved = localStorage.getItem(STORAGE_DATA_KEY);
+        if (saved) {
+          return JSON.parse(saved);
         }
-
-        userId = auth.currentUser?.uid || crypto.randomUUID();
-        
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
-        onSnapshot(docRef, (docSnap) => {
-          if (docSnap.exists()) {
-            window.appData = docSnap.data();
-            if (!window.appData.headline) {
-              window.appData.headline = defaultAppData.headline;
-            }
-            renderAll();
-          } else {
-            setDoc(docRef, defaultAppData).then(() => {
-              window.appData = defaultAppData;
-              renderAll();
-            }).catch(() => {});
-          }
-        }, (err) => {
-          console.warn("Firestore listener error:", err);
-          renderAll();
-        });
-
       } catch (e) {
-        console.warn("Firebase fallback:", e);
-        renderAll();
+        console.warn("Could not load from localStorage:", e);
       }
-
-      window.currentUser = loadUserSession();
-      renderAll();
+      return JSON.parse(JSON.stringify(defaultAppData));
     }
 
-    window.saveData = async function() {
-      renderAll();
-      if (!db) return;
+    window.savePermanentChanges = function() {
       try {
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
-        await setDoc(docRef, window.appData, { merge: true });
+        localStorage.setItem(STORAGE_DATA_KEY, JSON.stringify(window.appData));
+        showToast("Changes permanently saved to website!");
+        renderAll();
       } catch (e) {
-        console.error("Error saving data to cloud:", e);
+        console.error("Failed to save:", e);
+        showToast("Error saving changes.", true);
       }
     };
+
+    window.saveData = function() {
+      // Automatically save to local state and memory
+      renderAll();
+    };
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      text.innerText = msg;
+      toast.className = `fixed bottom-5 right-5 z-50 transform transition-all duration-300 text-white font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 ${isError ? 'bg-red-600' : 'bg-green-600'} translate-y-0 opacity-100`;
+      setTimeout(() => {
+        toast.className = 'fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-green-600 text-white font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2';
+      }, 3000);
+    }
 
     function loadUserSession() {
       try {
@@ -610,7 +592,7 @@
 
     window.onload = function() {
       lucide.createIcons();
-      initFirebase();
+      renderAll();
     };
 
     window.renderAll = function() {
@@ -710,12 +692,14 @@
 
       window.saveUserSession(user);
       window.closeAuthModal();
+      showToast("Signed in successfully as " + username);
     }
 
     window.logoutUser = function() {
       localStorage.removeItem(CURRENT_USER_KEY);
       window.currentUser = null;
       renderAll();
+      showToast("Logged out successfully");
     }
 
     function renderDashboard() {
@@ -795,7 +779,7 @@
             <label class="block font-bold text-gray-300 mb-1">Description / Summary</label>
             <textarea id="admHlDesc" rows="3" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>${hl.desc}</textarea>
           </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl shadow">Save Headline</button>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl shadow">Update Headline</button>
         </form>
       `;
     }
@@ -809,6 +793,7 @@
       };
       saveData();
       closeAdminModal();
+      showToast("Headline updated! Click 'Save Changes' at the top to make it permanent.");
     }
 
     function renderSchedule() {
@@ -972,6 +957,7 @@
         t.record = document.getElementById('editTeamRecord').value.trim();
         saveData();
         closeAdminModal();
+        showToast("Team updated! Click 'Save Changes' at the top to make it permanent.");
       }
     }
 
@@ -1012,6 +998,7 @@
         p.sacks = parseInt(document.getElementById('editPlayerSacks').value) || 0;
         saveData();
         closeAdminModal();
+        showToast("Player updated! Click 'Save Changes' at the top to make it permanent.");
       }
     }
 
@@ -1399,6 +1386,7 @@
         g.status = document.getElementById('editStatus').value;
         saveData();
         closeAdminModal();
+        showToast("Game updated! Click 'Save Changes' at the top to make it permanent.");
       }
     }
 
@@ -1416,6 +1404,7 @@
       });
       saveData();
       closeAdminModal();
+      showToast("Game added! Click 'Save Changes' at the top to make it permanent.");
     }
 
     window.saveNewPlayer = function(e) {
@@ -1432,6 +1421,7 @@
       });
       saveData();
       closeAdminModal();
+      showToast("Player added! Click 'Save Changes' at the top to make it permanent.");
     }
 
     window.saveNewNews = function(e) {
@@ -1445,11 +1435,13 @@
       });
       saveData();
       closeAdminModal();
+      showToast("News published! Click 'Save Changes' at the top to make it permanent.");
     }
 
     window.deleteNews = function(id) {
       window.appData.news = window.appData.news.filter(n => n.id !== id);
       saveData();
+      showToast("News deleted! Click 'Save Changes' at the top to make it permanent.");
     }
 
     window.saveNewHof = function(e) {
@@ -1464,11 +1456,13 @@
       });
       saveData();
       closeAdminModal();
+      showToast("Added to HOF! Click 'Save Changes' at the top to make it permanent.");
     }
 
     window.deleteHof = function(id) {
       window.appData.hof = window.appData.hof.filter(h => h.id !== id);
       saveData();
+      showToast("HOF entry deleted! Click 'Save Changes' at the top to make it permanent.");
     }
 
     window.savePlayoffChampion = function(e) {
@@ -1476,6 +1470,7 @@
       window.appData.playoffs.championship.winnerId = document.getElementById('admChampTeam').value || null;
       saveData();
       closeAdminModal();
+      showToast("Playoff champion updated! Click 'Save Changes' at the top to make it permanent.");
     }
   </script>
 </body>
