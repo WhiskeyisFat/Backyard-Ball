@@ -54,12 +54,6 @@
       background: #444;
       border-radius: 4px;
     }
-    [contenteditable="true"] {
-      outline: 2px dashed #CC0000;
-      padding: 2px 4px;
-      border-radius: 4px;
-      background: rgba(204, 0, 0, 0.1);
-    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen bg-[#0d0d0d]">
@@ -158,13 +152,9 @@
               </button>
             </div>
             <div class="absolute bottom-5 left-5 right-5">
-              <p id="dashHeadlineSubtitle" class="text-espn-gold font-black text-xs sm:text-sm uppercase tracking-widest mb-1">Backyard Bowl Season XVII</p>
-              <h2 id="dashHeadlineTitle" class="text-xl sm:text-3xl font-display font-black text-white leading-tight mb-2">
-                Mud, Turf, and Glory: Backyard Ball League Ready for Kickoff
-              </h2>
-              <p id="dashHeadlineDesc" class="text-gray-300 text-xs sm:text-sm line-clamp-2">
-                Field 1 and Field 2 assignments are officially locked in for Sunday!
-              </p>
+              <p id="dashHeadlineSubtitle" class="text-espn-gold font-black text-xs sm:text-sm uppercase tracking-widest mb-1"></p>
+              <h2 id="dashHeadlineTitle" class="text-xl sm:text-3xl font-display font-black text-white leading-tight mb-2"></h2>
+              <p id="dashHeadlineDesc" class="text-gray-300 text-xs sm:text-sm line-clamp-2"></p>
             </div>
           </div>
         </div>
@@ -412,10 +402,10 @@
       </div>
 
       <div class="flex space-x-2 border-b border-espn-border pb-3 overflow-x-auto text-xs sm:text-sm">
-        <button onclick="filterHof('all')" id="hof-filter-all" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">All</button>
-        <button onclick="filterHof('player')" id="hof-filter-player" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Players</button>
-        <button onclick="filterHof('team')" id="hof-filter-team" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Teams</button>
-        <button onclick="filterHof('award')" id="hof-filter-award" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Awards</button>
+        <button onclick="filterHof('all')" id="hof-filter-all" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold transition">All</button>
+        <button onclick="filterHof('player')" id="hof-filter-player" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold transition">Players</button>
+        <button onclick="filterHof('team')" id="hof-filter-team" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold transition">Teams</button>
+        <button onclick="filterHof('award')" id="hof-filter-award" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold transition">Awards</button>
       </div>
 
       <div id="hofGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -472,7 +462,7 @@
     const CURRENT_USER_KEY = 'byb_active_user_session';
     const ADMIN_EMAIL = 'hpillon77@gmail.com';
 
-    const initialData = {
+    const defaultAppData = {
       headline: {
         subtitle: 'Backyard Bowl Season XVII',
         title: 'Mud, Turf, and Glory: Backyard Ball League Ready for Kickoff',
@@ -533,7 +523,7 @@
       ]
     };
 
-    window.appData = initialData;
+    window.appData = defaultAppData;
     window.currentUser = null;
     window.currentTab = 'dashboard';
     window.currentStatSort = 'td';
@@ -554,32 +544,27 @@
 
         userId = auth.currentUser?.uid || crypto.randomUUID();
         
-        // STRICT PUBLIC CLOUD PATH
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
         onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             window.appData = docSnap.data();
             if (!window.appData.headline) {
-              window.appData.headline = initialData.headline;
+              window.appData.headline = defaultAppData.headline;
             }
-            localStorage.setItem('byb_local_league_cache', JSON.stringify(window.appData));
             renderAll();
           } else {
-            setDoc(docRef, initialData).catch(() => {});
+            setDoc(docRef, defaultAppData).then(() => {
+              window.appData = defaultAppData;
+              renderAll();
+            }).catch(() => {});
           }
         }, (err) => {
           console.warn("Firestore listener error:", err);
-          const cached = localStorage.getItem('byb_local_league_cache');
-          if (cached) {
-            window.appData = JSON.parse(cached);
-            renderAll();
-          }
+          renderAll();
         });
 
       } catch (e) {
-        console.warn("Firebase auth/init fallback:", e);
-        const cached = localStorage.getItem('byb_local_league_cache');
-        window.appData = cached ? JSON.parse(cached) : initialData;
+        console.warn("Firebase fallback:", e);
         renderAll();
       }
 
@@ -589,7 +574,6 @@
 
     window.saveData = async function() {
       renderAll();
-      localStorage.setItem('byb_local_league_cache', JSON.stringify(window.appData));
       if (!db) return;
       try {
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
@@ -735,7 +719,7 @@
     }
 
     function renderDashboard() {
-      const hl = window.appData.headline || initialData.headline;
+      const hl = window.appData.headline || defaultAppData.headline;
       document.getElementById('dashHeadlineSubtitle').innerText = hl.subtitle;
       document.getElementById('dashHeadlineTitle').innerText = hl.title;
       document.getElementById('dashHeadlineDesc').innerText = hl.desc;
@@ -794,7 +778,7 @@
     }
 
     window.editHeadlineModal = function() {
-      const hl = window.appData.headline || initialData.headline;
+      const hl = window.appData.headline || defaultAppData.headline;
       openAdminModal('general');
       document.getElementById('adminModalContent').innerHTML = `
         <h3 class="font-display font-black text-lg text-white mb-3">EDIT DASHBOARD HEADLINE</h3>
@@ -1057,9 +1041,9 @@
               </div>
               <span class="text-[10px] text-gray-400 font-semibold block">${team ? team.name : ''}</span>
             </td>
-            <td class="p-3 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
-            <td class="p-3 text-center font-black text-espn-red text-base">${p.int || 0}</td>
-            <td class="p-3 text-center font-mono font-bold text-gray-200 text-base">${p.sacks || 0}</td>
+            <td class="p-3 text-center font-black ${window.currentStatSort === 'td' ? 'text-espn-red' : 'text-espn-gold'} text-base">${p.td || 0}</td>
+            <td class="p-3 text-center font-black ${window.currentStatSort === 'int' ? 'text-espn-red' : 'text-gray-200'} text-base">${p.int || 0}</td>
+            <td class="p-3 text-center font-mono font-bold ${window.currentStatSort === 'sacks' ? 'text-espn-red' : 'text-gray-200'} text-base">${p.sacks || 0}</td>
           </tr>
         `;
       }).join('');
