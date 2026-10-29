@@ -1,6 +1,13 @@
+{
+"name": "Backyard Ball - Knee Football League",
+"short_name": "Backyard Ball",
+"description": "Official app for Backyard Ball Knee Football League - Schedules, Scores, Standings, Player Stats & Live Chat.",
+"start_url": "./index.html",
+"display": "standalone",
 "background_color": "#0d0d0d",
 "theme_color": "#CC0000",
 "orientation": "portrait",
+"scope": "./",
 "categories": ["sports", "entertainment", "social"],
 "icons": [
 {
@@ -9,5 +16,5 @@
 "type": "image/svg+xml",
 "purpose": "any maskable"
 }
-],
-"screenshots": [
+]
+}
