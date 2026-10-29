@@ -563,7 +563,6 @@
 
     function setupCloudSync() {
       try {
-        // Correct Firestore Path according to architectural rules
         const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data');
         docRef.onSnapshot((docSnap) => {
           if (docSnap.exists) {
@@ -587,12 +586,20 @@
       try {
         localStorage.setItem('byb_permanent_league_data_v2', JSON.stringify(window.appData));
 
-        if (db && auth) {
+        if (db) {
           const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data');
           await docRef.set({ payload: window.appData });
           showToast("Changes saved globally to cloud & synced across all devices!");
         } else {
-          showToast("Changes saved locally! (Cloud offline)");
+          // Attempt instant fallback connection if db wasn't initialized yet
+          if (typeof firebase !== 'undefined' && firebase.apps.length) {
+            db = firebase.firestore();
+            const docRef = db.collection('artifacts').doc(APP_ID).collection('public').doc('data');
+            await docRef.set({ payload: window.appData });
+            showToast("Changes saved globally to cloud & synced across all devices!");
+          } else {
+            showToast("Changes saved locally! (Cloud offline - connect to internet)");
+          }
         }
         renderAll();
       } catch (e) {
@@ -603,7 +610,6 @@
 
     window.saveData = function() {
       renderAll();
-      // Auto-save globally in background if admin
       if (window.isAdmin() && db) {
         db.collection('artifacts').doc(APP_ID).collection('public').doc('data').set({ payload: window.appData }).catch(err => console.log(err));
       }
