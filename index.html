@@ -387,6 +387,7 @@
           <div id="chatAuthPrompt" class="hidden text-center py-1.5 text-xs text-gray-400">
             <button onclick="openAuthModal()" class="text-espn-red font-bold underline cursor-pointer">Sign in to participate in chat</button>
           </div>
+          <div id="wsStatus" class="text-xs text-center py-1 text-yellow-500 font-semibold">Connecting to chat server...</div>
           <form id="chatForm" onsubmit="sendChatMessage(event)" class="flex gap-2">
             <input type="text" id="chatInput" placeholder="Type a message..." class="flex-grow bg-espn-card border border-espn-border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-espn-red" required>
             <button type="submit" class="bg-espn-red hover:bg-espn-darkRed text-white font-extrabold px-5 py-3 rounded-xl text-sm transition shrink-0 shadow cursor-pointer">Send</button>
@@ -521,6 +522,63 @@
     window.currentStatSort = 'td';
     window.currentHofFilter = 'all';
     window.selectedTeamId = 't1';
+
+    // WebSocket Real-Time Chat Connection
+    let chatSocket = null;
+    const WS_SERVER_URL = window.location.protocol === 'https:' 
+      ? 'wss://' + window.location.host 
+      : 'ws://' + (window.location.hostname || 'localhost') + ':8080';
+
+    function initWebSocketChat() {
+      const statusEl = document.getElementById('wsStatus');
+      try {
+        chatSocket = new WebSocket(WS_SERVER_URL);
+
+        chatSocket.onopen = () => {
+          console.log('Connected to WebSocket server!');
+          if (statusEl) statusEl.className = 'hidden';
+        };
+
+        chatSocket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'chat') {
+              // Add received message to local appData if not duplicate
+              if (!window.appData.chat.some(c => c.id === data.id)) {
+                window.appData.chat.push({
+                  id: data.id,
+                  user: data.user,
+                  name: data.name,
+                  text: data.text,
+                  timestamp: data.timestamp
+                });
+                renderChat();
+              }
+            }
+          } catch (err) {
+            console.error('Error handling WebSocket message:', err);
+          }
+        };
+
+        chatSocket.onclose = () => {
+          if (statusEl) {
+            statusEl.className = 'text-xs text-center py-1 text-amber-500 font-semibold';
+            statusEl.innerText = 'Chat server disconnected. Reconnecting...';
+          }
+          // Auto-reconnect after 3 seconds
+          setTimeout(initWebSocketChat, 3000);
+        };
+
+        chatSocket.onerror = (err) => {
+          if (statusEl) {
+            statusEl.className = 'text-xs text-center py-1 text-red-500 font-semibold';
+            statusEl.innerText = 'Live WebSocket offline (fallback mode active)';
+          }
+        };
+      } catch (e) {
+        console.warn('WebSocket connection error:', e);
+      }
+    }
 
     // Cloud JSONbin Sync Settings (Public Shared Bin for Instant Cross-Device Sync)
     const CLOUD_SYNC_BIN_ID = '673a5a7cad1931442a862c94'; 
@@ -1084,221 +1142,128 @@
 
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      window.appData.chat.push({
+      const msgObj = {
         id: 'c_' + Date.now(),
         user: window.currentUser.email,
         name: window.currentUser.name,
         text: text,
         timestamp: timeStr
-      });
+      };
+
+      // 1. If WebSocket is connected, send message directly over persistent WebSocket
+      if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        chatSocket.send(JSON.stringify(msgObj));
+      } else {
+        // Fallback to storing in appData and saving
+        window.appData.chat.push(msgObj);
+        renderChat();
+        saveData();
+      }
 
       input.value = '';
-      renderChat();
-      saveData();
     }
 
     function renderHof() {
+      const container = document.getElementById('hofGridContainer');
       const filter = window.currentHofFilter;
+      const isAdmin = window.currentUser && window.currentUser.email === ADMIN_EMAIL;
+
       document.querySelectorAll('.hof-filter-btn').forEach(btn => {
         btn.classList.remove('bg-espn-gold', 'text-black');
-        btn.classList.add('bg-espn-card', 'text-gray-300', 'border', 'border-espn-border');
+        btn.classList.add('bg-black', 'text-gray-300', 'border', 'border-espn-border');
       });
       const activeBtn = document.getElementById(`hof-filter-${filter}`);
       if (activeBtn) {
-        activeBtn.classList.remove('bg-espn-card', 'text-gray-300', 'border', 'border-espn-border');
+        activeBtn.classList.remove('bg-black', 'text-gray-300', 'border', 'border-espn-border');
         activeBtn.classList.add('bg-espn-gold', 'text-black');
       }
 
-      const grid = document.getElementById('hofGridContainer');
-      const filtered = filter === 'all' ? window.appData.hof : window.appData.hof.filter(h => h.type === filter);
-      const isAdmin = window.currentUser && window.currentUser.email === ADMIN_EMAIL;
+      const filtered = window.appData.hof.filter(item => filter === 'all' || item.type === filter);
 
-      grid.innerHTML = filtered.map(h => `
-        <div class="bg-espn-card border border-espn-gold/40 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+      container.innerHTML = filtered.map(item => `
+        <div class="bg-gradient-to-b from-espn-card to-black p-5 rounded-2xl border border-espn-gold/40 shadow-xl flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-2">
-              <span class="bg-espn-gold/20 text-espn-gold text-[10px] font-black uppercase px-2 py-0.5 rounded">${h.type}</span>
-              <span class="text-xs font-bold text-gray-400">${h.year}</span>
+              <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-espn-gold/20 text-espn-gold border border-espn-gold/30">${item.type}</span>
+              <span class="text-xs font-mono text-gray-400">${item.year}</span>
             </div>
-            <h3 class="font-display font-black text-xl text-white mb-1">${h.name}</h3>
-            <p class="text-xs font-bold text-espn-gold mb-2">${h.title}</p>
-            <p class="text-xs text-gray-300">${h.desc}</p>
+            <h3 class="font-display font-black text-xl text-white mb-1">${item.name}</h3>
+            <p class="text-xs font-extrabold text-espn-gold uppercase tracking-wider mb-2">${item.title}</p>
+            <p class="text-gray-300 text-xs leading-relaxed">${item.desc}</p>
           </div>
           ${isAdmin ? `
-            <div class="mt-4 pt-3 border-t border-espn-border flex justify-end">
-              <button onclick="deleteHof('${h.id}')" class="text-xs text-red-400 hover:text-red-300 font-bold cursor-pointer">Remove Entry</button>
+            <div class="mt-4 pt-3 border-t border-espn-border/50 flex justify-end">
+              <button onclick="deleteHof('${item.id}')" class="text-xs text-red-400 hover:text-red-300 font-bold cursor-pointer">Delete Entry</button>
             </div>
           ` : ''}
         </div>
       `).join('');
     }
 
-    function filterHof(type) {
-      window.currentHofFilter = type;
+    function filterHof(category) {
+      window.currentHofFilter = category;
       renderHof();
     }
 
-    // ADMIN MODALS & ACTIONS
-    function openAdminModal(action, extraId = null) {
+    function openAdminModal(type, targetId = null) {
       const modal = document.getElementById('adminModal');
       const content = document.getElementById('adminModalContent');
       modal.classList.remove('hidden');
 
-      if (action === 'addGame') {
+      if (type === 'addGame') {
         content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">Schedule New Game</h3>
-          <form onsubmit="handleAdminAddGame(event)" class="space-y-3">
+          <h3 class="font-display font-black text-xl text-white mb-4">ADD NEW GAME</h3>
+          <form onsubmit="saveNewGame(event)" class="space-y-3">
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Home Team</label>
-              <select id="admGameHome" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Home Team</label>
+              <select id="mHomeTeam" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
                 ${window.appData.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Away Team</label>
-              <select id="admGameAway" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Away Team</label>
+              <select id="mAwayTeam" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
                 ${window.appData.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
-              <input type="text" id="admGameDate" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="Nov 02" required>
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Date / Time</label>
+              <input type="text" id="mGameDate" placeholder="Oct 26, 2:00 PM" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Field</label>
-              <input type="text" id="admGameField" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="Field 1" required>
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Field Location</label>
+              <input type="text" id="mGameField" placeholder="Field 1" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
             </div>
-            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Add Game</button>
+            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase shadow cursor-pointer mt-2">Add Game</button>
           </form>
         `;
-      } else if (action === 'addPlayer') {
+      } else if (type === 'addPlayer') {
         content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">Add Player to Roster</h3>
-          <form onsubmit="handleAdminAddPlayer(event)" class="space-y-3">
+          <h3 class="font-display font-black text-xl text-white mb-4">ADD PLAYER</h3>
+          <form onsubmit="saveNewPlayer(event)" class="space-y-3">
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Team</label>
-              <select id="admPlayerTeam" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Team</label>
+              <select id="mPlayerTeam" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
                 ${window.appData.teams.map(t => `<option value="${t.id}" ${t.id === window.selectedTeamId ? 'selected' : ''}>${t.name}</option>`).join('')}
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Player Name</label>
-              <input type="text" id="admPlayerName" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="e.g. John Doe">
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Jersey #</label>
+              <input type="text" id="mPlayerNum" placeholder="12" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Jersey Number</label>
-              <input type="text" id="admPlayerNum" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="10">
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Player Name</label>
+              <input type="text" id="mPlayerName" placeholder="Full Name" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Position</label>
-              <input type="text" id="admPlayerPos" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="QB / DB">
+              <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Position</label>
+              <input type="text" id="mPlayerPos" placeholder="QB/DB" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">TDs</label>
-                <input type="number" id="admPlayerTd" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white text-center" value="0">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">INTs</label>
-                <input type="number" id="admPlayerInt" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white text-center" value="0">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Sacks</label>
-                <input type="number" id="admPlayerSacks" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white text-center" value="0">
-              </div>
-            </div>
-            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Save Player</button>
-          </form>
-        `;
-      } else if (action === 'addNews') {
-        content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">Publish News Article</h3>
-          <form onsubmit="handleAdminAddNews(event)" class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Headline</label>
-              <input type="text" id="admNewsTitle" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="Article headline">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Tagline</label>
-              <input type="text" id="admNewsTagline" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="Short summary">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Image URL</label>
-              <input type="url" id="admNewsImg" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=600&q=80" required>
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Full Content</label>
-              <textarea id="admNewsContent" rows="4" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="Full story..."></textarea>
-            </div>
-            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Publish Article</button>
-          </form>
-        `;
-      } else if (action === 'addHof') {
-        content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">Add Hall of Fame Entry</h3>
-          <form onsubmit="handleAdminAddHof(event)" class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Category</label>
-              <select id="admHofType" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
-                <option value="player">Player</option>
-                <option value="team">Team</option>
-                <option value="award">Award</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Name</label>
-              <input type="text" id="admHofName" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="e.g. Hunter Pillon">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Title / Achievement</label>
-              <input type="text" id="admHofTitle" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="All-Time TD Leader">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Year</label>
-              <input type="text" id="admHofYear" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required value="2026">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Description</label>
-              <textarea id="admHofDesc" rows="3" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required placeholder="Career summary..."></textarea>
-            </div>
-            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Add to HOF</button>
-          </form>
-        `;
-      } else if (action === 'editPlayoffs') {
-        const p = window.appData.playoffs;
-        content.innerHTML = `
-          <h3 class="font-display font-black text-xl text-white mb-4">Edit Playoff Scores & Winners</h3>
-          <form onsubmit="handleAdminEditPlayoffs(event)" class="space-y-4">
-            <div class="bg-black/50 p-3 rounded-xl border border-espn-border space-y-2">
-              <h4 class="text-xs font-bold text-espn-red uppercase">Semifinal 1 Winner</h4>
-              <select id="admSemi1Winner" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white">
-                <option value="${p.semi1.homeId}" ${p.semi1.winnerId === p.semi1.homeId ? 'selected' : ''}>${(window.appData.teams.find(t=>t.id===p.semi1.homeId)||{}).name}</option>
-                <option value="${p.semi1.awayId}" ${p.semi1.winnerId === p.semi1.awayId ? 'selected' : ''}>${(window.appData.teams.find(t=>t.id===p.semi1.awayId)||{}).name}</option>
-              </select>
-            </div>
-            <div class="bg-black/50 p-3 rounded-xl border border-espn-border space-y-2">
-              <h4 class="text-xs font-bold text-espn-red uppercase">Semifinal 2 Winner</h4>
-              <select id="admSemi2Winner" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white">
-                <option value="${p.semi2.homeId}" ${p.semi2.winnerId === p.semi2.homeId ? 'selected' : ''}>${(window.appData.teams.find(t=>t.id===p.semi2.homeId)||{}).name}</option>
-                <option value="${p.semi2.awayId}" ${p.semi2.winnerId === p.semi2.awayId ? 'selected' : ''}>${(window.appData.teams.find(t=>t.id===p.semi2.awayId)||{}).name}</option>
-              </select>
-            </div>
-            <div class="bg-black/50 p-3 rounded-xl border border-espn-border space-y-2">
-              <h4 class="text-xs font-bold text-espn-gold uppercase">Backyard Bowl Champion</h4>
-              <select id="admChampWinner" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white">
-                <option value="">TBD</option>
-                ${window.appData.teams.map(t => `<option value="${t.id}" ${p.championship.winnerId === t.id ? 'selected' : ''}>${t.name}</option>`).join('')}
-              </select>
-            </div>
-            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Update Playoffs</button>
+            <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase shadow cursor-pointer mt-2">Save Player</button>
           </form>
         `;
       }
-    }
-
-    function closeAdminModal() {
-      document.getElementById('adminModal').classList.add('hidden');
+      lucide.createIcons();
     }
 
     function editHeadlineModal() {
@@ -1307,319 +1272,98 @@
       modal.classList.remove('hidden');
       const h = window.appData.headline;
       content.innerHTML = `
-        <h3 class="font-display font-black text-xl text-white mb-4">Edit Dashboard Headline</h3>
-        <form onsubmit="handleAdminEditHeadline(event)" class="space-y-3">
+        <h3 class="font-display font-black text-xl text-white mb-4">EDIT HEADLINE</h3>
+        <form onsubmit="saveHeadline(event)" class="space-y-3">
           <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Subtitle</label>
-            <input type="text" id="admHeadSubtitle" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${h.subtitle}" required>
+            <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Tagline</label>
+            <input type="text" id="mHeadTag" value="${h.subtitle}" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Title</label>
-            <input type="text" id="admHeadTitle" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${h.title}" required>
+            <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Title</label>
+            <input type="text" id="mHeadTitle" value="${h.title}" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Description</label>
-            <textarea id="admHeadDesc" rows="3" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>${h.desc}</textarea>
+            <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Description</label>
+            <textarea id="mHeadDesc" rows="3" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" required>${h.desc}</textarea>
           </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Update Headline</button>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase shadow cursor-pointer">Update Headline</button>
         </form>
       `;
+      lucide.createIcons();
     }
 
-    function handleAdminEditHeadline(e) {
+    function saveHeadline(e) {
       e.preventDefault();
       window.appData.headline = {
-        subtitle: document.getElementById('admHeadSubtitle').value,
-        title: document.getElementById('admHeadTitle').value,
-        desc: document.getElementById('admHeadDesc').value
+        subtitle: document.getElementById('mHeadTag').value,
+        title: document.getElementById('mHeadTitle').value,
+        desc: document.getElementById('mHeadDesc').value
       };
-      saveData();
       closeAdminModal();
-      showToast("Headline updated successfully!");
+      saveData();
     }
 
-    function editGameModal(gameId) {
-      const g = window.appData.games.find(x => x.id === gameId);
-      if (!g) return;
-      const modal = document.getElementById('adminModal');
-      const content = document.getElementById('adminModalContent');
-      modal.classList.remove('hidden');
-      content.innerHTML = `
-        <h3 class="font-display font-black text-xl text-white mb-4">Edit Game Score</h3>
-        <form onsubmit="handleAdminUpdateGame(event, '${g.id}')" class="space-y-3">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Away Score</label>
-              <input type="number" id="admEditAwayScore" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white text-center font-bold" value="${g.awayScore !== null ? g.awayScore : 0}" required>
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Home Score</label>
-              <input type="number" id="admEditHomeScore" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white text-center font-bold" value="${g.homeScore !== null ? g.homeScore : 0}" required>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Status</label>
-            <select id="admEditStatus" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white">
-              <option value="FINAL" ${g.status === 'FINAL' ? 'selected' : ''}>FINAL</option>
-              <option value="LIVE" ${g.status === 'LIVE' ? 'selected' : ''}>LIVE</option>
-              <option value="UPCOMING" ${g.status === 'UPCOMING' ? 'selected' : ''}>UPCOMING</option>
-            </select>
-          </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Save Game Score</button>
-        </form>
-      `;
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
     }
 
-    function handleAdminUpdateGame(e, gameId) {
+    function saveNewGame(e) {
       e.preventDefault();
-      const g = window.appData.games.find(x => x.id === gameId);
-      if (g) {
-        g.awayScore = parseInt(document.getElementById('admEditAwayScore').value);
-        g.homeScore = parseInt(document.getElementById('admEditHomeScore').value);
-        g.status = document.getElementById('admEditStatus').value;
-        recalculateStandings();
-        saveData();
-        closeAdminModal();
-        showToast("Game updated successfully!");
-      }
-    }
-
-    function deleteGame(gameId) {
-      if (confirm("Are you sure you want to delete this game?")) {
-        window.appData.games = window.appData.games.filter(g => g.id !== gameId);
-        saveData();
-        showToast("Game deleted.");
-      }
-    }
-
-    function handleAdminAddGame(e) {
-      e.preventDefault();
-      window.appData.games.push({
+      const newG = {
         id: 'g_' + Date.now(),
-        homeId: document.getElementById('admGameHome').value,
-        awayId: document.getElementById('admGameAway').value,
+        homeId: document.getElementById('mHomeTeam').value,
+        awayId: document.getElementById('mAwayTeam').value,
         homeScore: null,
         awayScore: null,
         status: 'UPCOMING',
-        date: document.getElementById('admGameDate').value,
-        field: document.getElementById('admGameField').value
-      });
-      saveData();
+        date: document.getElementById('mGameDate').value,
+        field: document.getElementById('mGameField').value
+      };
+      window.appData.games.push(newG);
       closeAdminModal();
-      showToast("Game scheduled!");
+      saveData();
     }
 
-    function editTeamModal(teamId) {
-      const t = window.appData.teams.find(x => x.id === teamId);
-      if (!t) return;
-      const modal = document.getElementById('adminModal');
-      const content = document.getElementById('adminModalContent');
-      modal.classList.remove('hidden');
-      content.innerHTML = `
-        <h3 class="font-display font-black text-xl text-white mb-4">Edit Team Details</h3>
-        <form onsubmit="handleAdminUpdateTeam(event, '${t.id}')" class="space-y-3">
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Team Name</label>
-            <input type="text" id="admEditTeamName" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${t.name}" required>
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Record</label>
-            <input type="text" id="admEditTeamRecord" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${t.record}" required>
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Logo Emoji</label>
-            <input type="text" id="admEditTeamLogo" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${t.logo}" required>
-          </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Save Team</button>
-        </form>
-      `;
-    }
-
-    function handleAdminUpdateTeam(e, teamId) {
+    function saveNewPlayer(e) {
       e.preventDefault();
-      const t = window.appData.teams.find(x => x.id === teamId);
-      if (t) {
-        t.name = document.getElementById('admEditTeamName').value;
-        t.record = document.getElementById('admEditTeamRecord').value;
-        t.logo = document.getElementById('admEditTeamLogo').value;
-        saveData();
-        closeAdminModal();
-        showToast("Team updated!");
-      }
-    }
-
-    function handleAdminAddPlayer(e) {
-      e.preventDefault();
-      window.appData.players.push({
+      const newP = {
         id: 'p_' + Date.now(),
-        teamId: document.getElementById('admPlayerTeam').value,
-        name: document.getElementById('admPlayerName').value,
-        number: document.getElementById('admPlayerNum').value,
-        pos: document.getElementById('admPlayerPos').value,
-        td: parseInt(document.getElementById('admPlayerTd').value) || 0,
-        int: parseInt(document.getElementById('admPlayerInt').value) || 0,
-        sacks: parseInt(document.getElementById('admPlayerSacks').value) || 0
-      });
-      saveData();
+        teamId: document.getElementById('mPlayerTeam').value,
+        number: document.getElementById('mPlayerNum').value,
+        name: document.getElementById('mPlayerName').value,
+        pos: document.getElementById('mPlayerPos').value,
+        td: 0,
+        int: 0,
+        sacks: 0
+      };
+      window.appData.players.push(newP);
       closeAdminModal();
-      showToast("Player added to roster!");
-    }
-
-    function editPlayerModal(playerId) {
-      const p = window.appData.players.find(x => x.id === playerId);
-      if (!p) return;
-      const modal = document.getElementById('adminModal');
-      const content = document.getElementById('adminModalContent');
-      modal.classList.remove('hidden');
-      content.innerHTML = `
-        <h3 class="font-display font-black text-xl text-white mb-4">Edit Player Stats</h3>
-        <form onsubmit="handleAdminUpdatePlayer(event, '${p.id}')" class="space-y-3">
-          <div>
-            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Player Name</label>
-            <input type="text" id="admEditPlayerName" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${p.name}" required>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Number</label>
-              <input type="text" id="admEditPlayerNum" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${p.number}" required>
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Position</label>
-              <input type="text" id="admEditPlayerPos" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white" value="${p.pos}" required>
-            </div>
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            <div>
-              <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">TDs</label>
-              <input type="number" id="admEditPlayerTd" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white text-center" value="${p.td}">
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">INTs</label>
-              <input type="number" id="admEditPlayerInt" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white text-center" value="${p.int}">
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Sacks</label>
-              <input type="number" id="admEditPlayerSacks" class="w-full bg-black border border-espn-border rounded-xl p-2.5 text-sm text-white text-center" value="${p.sacks}">
-            </div>
-          </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider cursor-pointer">Save Player Stats</button>
-        </form>
-      `;
-    }
-
-    function handleAdminUpdatePlayer(e, playerId) {
-      e.preventDefault();
-      const p = window.appData.players.find(x => x.id === playerId);
-      if (p) {
-        p.name = document.getElementById('admEditPlayerName').value;
-        p.number = document.getElementById('admEditPlayerNum').value;
-        p.pos = document.getElementById('admEditPlayerPos').value;
-        p.td = parseInt(document.getElementById('admEditPlayerTd').value) || 0;
-        p.int = parseInt(document.getElementById('admEditPlayerInt').value) || 0;
-        p.sacks = parseInt(document.getElementById('admEditPlayerSacks').value) || 0;
-        saveData();
-        closeAdminModal();
-        showToast("Player updated successfully!");
-      }
-    }
-
-    function deletePlayer(playerId) {
-      if (confirm("Remove this player from the roster?")) {
-        window.appData.players = window.appData.players.filter(p => p.id !== playerId);
-        saveData();
-        showToast("Player removed.");
-      }
-    }
-
-    function handleAdminAddNews(e) {
-      e.preventDefault();
-      window.appData.news.unshift({
-        id: 'n_' + Date.now(),
-        headline: document.getElementById('admNewsTitle').value,
-        tagline: document.getElementById('admNewsTagline').value,
-        date: 'Today',
-        image: document.getElementById('admNewsImg').value,
-        content: document.getElementById('admNewsContent').value
-      });
       saveData();
-      closeAdminModal();
-      showToast("News article published!");
     }
 
-    function deleteNews(newsId) {
-      if (confirm("Delete this article?")) {
-        window.appData.news = window.appData.news.filter(n => n.id !== newsId);
-        saveData();
-        showToast("Article deleted.");
-      }
-    }
-
-    function handleAdminAddHof(e) {
-      e.preventDefault();
-      window.appData.hof.push({
-        id: 'h_' + Date.now(),
-        type: document.getElementById('admHofType').value,
-        name: document.getElementById('admHofName').value,
-        title: document.getElementById('admHofTitle').value,
-        year: document.getElementById('admHofYear').value,
-        desc: document.getElementById('admHofDesc').value
-      });
+    function deleteGame(id) {
+      window.appData.games = window.appData.games.filter(g => g.id !== id);
       saveData();
-      closeAdminModal();
-      showToast("Added to Hall of Fame!");
     }
 
-    function deleteHof(hofId) {
-      if (confirm("Remove this HOF entry?")) {
-        window.appData.hof = window.appData.hof.filter(h => h.id !== hofId);
-        saveData();
-        showToast("HOF entry removed.");
-      }
-    }
-
-    function handleAdminEditPlayoffs(e) {
-      e.preventDefault();
-      window.appData.playoffs.semi1.winnerId = document.getElementById('admSemi1Winner').value;
-      window.appData.playoffs.semi2.winnerId = document.getElementById('admSemi2Winner').value;
-      window.appData.playoffs.championship.winnerId = document.getElementById('admChampWinner').value;
+    function deletePlayer(id) {
+      window.appData.players = window.appData.players.filter(p => p.id !== id);
       saveData();
-      closeAdminModal();
-      showToast("Playoff bracket updated!");
     }
 
-    function recalculateStandings() {
-      // Reset standing counts
-      window.appData.standings.forEach(st => {
-        st.w = 0; st.l = 0; st.t = 0; st.pf = 0; st.pa = 0;
-      });
+    function deleteNews(id) {
+      window.appData.news = window.appData.news.filter(n => n.id !== id);
+      saveData();
+    }
 
-      window.appData.games.forEach(g => {
-        if (g.status === 'FINAL' && g.homeScore !== null && g.awayScore !== null) {
-          const homeSt = window.appData.standings.find(s => s.teamId === g.homeId);
-          const awaySt = window.appData.standings.find(s => s.teamId === g.awayId);
-          if (homeSt && awaySt) {
-            homeSt.pf += g.homeScore;
-            homeSt.pa += g.awayScore;
-            awaySt.pf += g.awayScore;
-            awaySt.pa += g.homeScore;
-
-            if (g.homeScore > g.awayScore) {
-              homeSt.w += 1;
-              awaySt.l += 1;
-            } else if (g.awayScore > g.homeScore) {
-              awaySt.w += 1;
-              homeSt.l += 1;
-            } else {
-              homeSt.t += 1;
-              awaySt.t += 1;
-            }
-          }
-        }
-      });
+    function deleteHof(id) {
+      window.appData.hof = window.appData.hof.filter(h => h.id !== id);
+      saveData();
     }
 
     window.onload = function() {
       initCloudSync();
+      initWebSocketChat();
     };
   </script>
 </body>
