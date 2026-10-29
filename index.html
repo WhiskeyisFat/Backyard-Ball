@@ -143,22 +143,6 @@
     </div>
   </header>
 
-  <!-- ADMIN COMMISSIONER BANNER -->
-  <div id="adminBar" class="hidden bg-gradient-to-r from-red-900 via-espn-red to-black text-white px-4 py-3 text-xs sm:text-sm font-bold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-inner">
-    <div class="flex items-center space-x-2">
-      <span class="bg-black text-espn-gold px-2 py-1 rounded text-xs uppercase font-black tracking-wider">COMMISH</span>
-      <span class="text-xs sm:text-sm">Logged in as hpillon77@gmail.com</span>
-    </div>
-    <div class="flex items-center gap-2 w-full sm:w-auto">
-      <button onclick="toggleInlineEditMode()" id="inlineEditToggleBtn" class="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-200 transition shadow flex-grow sm:flex-grow-0 text-center">
-        <i data-lucide="edit-3" class="w-4 h-4 inline mr-1"></i> Enable Quick Inline Edit
-      </button>
-      <button onclick="openAdminModal('general')" class="bg-black text-white border border-white/30 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-900 transition shadow">
-        + Add Content
-      </button>
-    </div>
-  </div>
-
   <!-- MAIN CONTENT CONTAINER -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
 
@@ -294,9 +278,9 @@
           <h2 class="font-display font-black text-xl sm:text-2xl text-white">TEAMS & ROSTERS</h2>
           <p class="text-xs text-gray-400 mt-0.5">Select a team below to view active roster.</p>
         </div>
-        <button id="adminAddPlayerBtn" onclick="openAdminModal('addPlayer')" class="hidden bg-espn-red text-white px-3 py-2 rounded-xl text-xs font-extrabold shadow">
-          + Add Player
-        </button>
+        <div id="adminTeamActions" class="hidden flex gap-2">
+          <button onclick="openAdminModal('addPlayer')" class="bg-espn-red text-white px-3 py-2 rounded-xl text-xs font-extrabold shadow">+ Add Player</button>
+        </div>
       </div>
 
       <div id="teamSelectorList" class="flex space-x-2.5 overflow-x-auto pb-1 custom-scrollbar"></div>
@@ -329,6 +313,7 @@
                 <th class="p-3.5 text-center">TD</th>
                 <th class="p-3.5 text-center">INT</th>
                 <th class="p-3.5 text-center">Sacks</th>
+                <th id="adminStatHeader" class="hidden p-3.5 text-center">Action</th>
               </tr>
             </thead>
             <tbody id="playerStatsTableBody" class="divide-y divide-espn-border"></tbody>
@@ -644,14 +629,10 @@
     }
 
     function renderAdminElements() {
-      const adminBar = document.getElementById('adminBar');
       if (isAdmin()) {
-        adminBar.classList.remove('hidden');
         document.querySelectorAll('[id^="admin"]').forEach(el => el.classList.remove('hidden'));
       } else {
-        adminBar.classList.add('hidden');
         document.querySelectorAll('[id^="admin"]').forEach(el => el.classList.add('hidden'));
-        inlineEditActive = false;
       }
     }
 
@@ -842,7 +823,6 @@
 
       const activeTeam = appData.teams.find(t => t.id === selectedTeamId) || appData.teams[0];
       const teamPlayers = appData.players.filter(p => p.teamId === activeTeam.id);
-      const editable = (isAdmin() && inlineEditActive);
 
       const view = document.getElementById('activeTeamView');
       view.innerHTML = `
@@ -854,12 +834,12 @@
               <p class="text-xs text-espn-gold font-extrabold mt-0.5">RECORD: ${activeTeam.record}</p>
             </div>
           </div>
-          ${editable ? '<span class="text-xs text-espn-gold font-bold bg-black/60 px-3 py-1 rounded-lg border border-espn-gold/40">Quick Inline Edit Active</span>' : ''}
+          ${isAdmin() ? `<button onclick="editTeamModal('${activeTeam.id}')" class="bg-espn-red/20 text-espn-red hover:bg-espn-red hover:text-white px-3 py-1.5 rounded-xl text-xs font-extrabold transition flex items-center gap-1 shadow"><i data-lucide="edit-2" class="w-4 h-4"></i> Edit Team</button>` : ''}
         </div>
 
         <div class="bg-espn-card rounded-2xl border border-espn-border overflow-hidden shadow-xl">
           <div class="p-3 bg-black/60 border-b border-espn-border font-extrabold text-[11px] uppercase text-gray-400 tracking-wider flex justify-between items-center">
-            <span>Active Roster ${editable ? '(Click any cell to edit)' : ''}</span>
+            <span>Active Roster</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
@@ -871,17 +851,19 @@
                   <th class="p-2.5 text-center w-12">TD</th>
                   <th class="p-2.5 text-center w-12">INT</th>
                   <th class="p-2.5 text-center w-14">Sacks</th>
+                  ${isAdmin() ? '<th class="p-2.5 text-center w-16">Action</th>' : ''}
                 </tr>
               </thead>
               <tbody class="divide-y divide-espn-border">
                 ${teamPlayers.map(p => `
                   <tr>
-                    <td class="p-2.5 font-mono font-bold text-espn-red" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'number', this.innerText)"` : ''}>${p.number}</td>
-                    <td class="p-2.5 font-extrabold text-white" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'name', this.innerText)"` : ''}>${p.name}</td>
-                    <td class="p-2.5 text-[11px] text-gray-400 font-bold" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'pos', this.innerText)"` : ''}>${p.pos}</td>
-                    <td class="p-2.5 text-center font-black text-espn-gold" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'td', this.innerText)"` : ''}>${p.td || 0}</td>
-                    <td class="p-2.5 text-center font-black text-espn-red" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'int', this.innerText)"` : ''}>${p.int || 0}</td>
-                    <td class="p-2.5 text-center font-mono font-bold text-gray-200" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'sacks', this.innerText)"` : ''}>${p.sacks || 0}</td>
+                    <td class="p-2.5 font-mono font-bold text-espn-red">#${p.number}</td>
+                    <td class="p-2.5 font-extrabold text-white">${p.name}</td>
+                    <td class="p-2.5 text-[11px] text-gray-400 font-bold">${p.pos}</td>
+                    <td class="p-2.5 text-center font-black text-espn-gold">${p.td || 0}</td>
+                    <td class="p-2.5 text-center font-black text-espn-red">${p.int || 0}</td>
+                    <td class="p-2.5 text-center font-mono font-bold text-gray-200">${p.sacks || 0}</td>
+                    ${isAdmin() ? `<td class="p-2.5 text-center"><button onclick="editPlayerModal('${p.id}')" class="bg-espn-red/20 text-espn-red hover:bg-espn-red hover:text-white px-2 py-1 rounded text-[10px] font-extrabold transition">Edit</button></td>` : ''}
                   </tr>
                 `).join('')}
               </tbody>
@@ -889,6 +871,119 @@
           </div>
         </div>
       `;
+      lucide.createIcons();
+    }
+
+    function editTeamModal(teamId) {
+      const t = appData.teams.find(x => x.id === teamId);
+      if (!t) return;
+      openAdminModal('general');
+      document.getElementById('adminModalContent').innerHTML = `
+        <h3 class="font-display font-black text-lg text-white mb-3">EDIT TEAM</h3>
+        <form onsubmit="saveTeamFull(event, '${t.id}')" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Team Name</label>
+            <input type="text" id="editTeamName" value="${t.name}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Team Logo Emoji/Icon</label>
+            <input type="text" id="editTeamLogo" value="${t.logo}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Record</label>
+            <input type="text" id="editTeamRecord" value="${t.record}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+          </div>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl shadow">Save Team</button>
+        </form>
+      `;
+    }
+
+    function saveTeamFull(e, teamId) {
+      e.preventDefault();
+      const t = appData.teams.find(x => x.id === teamId);
+      if (t) {
+        t.name = document.getElementById('editTeamName').value.trim();
+        t.logo = document.getElementById('editTeamLogo').value.trim();
+        t.record = document.getElementById('editTeamRecord').value.trim();
+        saveData();
+        closeAdminModal();
+      }
+    }
+
+    function editPlayerModal(playerId) {
+      const p = appData.players.find(x => x.id === playerId);
+      if (!p) return;
+      openAdminModal('general');
+      document.getElementById('adminModalContent').innerHTML = `
+        <h3 class="font-display font-black text-lg text-white mb-3">EDIT PLAYER STATS & INFO</h3>
+        <form onsubmit="savePlayerFull(event, '${p.id}')" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Player Name</label>
+            <input type="text" id="editPlayerName" value="${p.name}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-bold text-gray-300 mb-1">Number</label><input type="text" id="editPlayerNum" value="${p.number}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+            <div><label class="block font-bold text-gray-300 mb-1">Position</label><input type="text" id="editPlayerPos" value="${p.pos}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div><label class="block font-bold text-gray-300 mb-1">Touchdowns</label><input type="number" id="editPlayerTd" value="${p.td || 0}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+            <div><label class="block font-bold text-gray-300 mb-1">Interceptions</label><input type="number" id="editPlayerInt" value="${p.int || 0}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+            <div><label class="block font-bold text-gray-300 mb-1">Sacks</label><input type="number" id="editPlayerSacks" value="${p.sacks || 0}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          </div>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl shadow">Save Player</button>
+        </form>
+      `;
+    }
+
+    function savePlayerFull(e, playerId) {
+      e.preventDefault();
+      const p = appData.players.find(x => x.id === playerId);
+      if (p) {
+        p.name = document.getElementById('editPlayerName').value.trim();
+        p.number = document.getElementById('editPlayerNum').value.trim();
+        p.pos = document.getElementById('editPlayerPos').value.trim();
+        p.td = parseInt(document.getElementById('editPlayerTd').value) || 0;
+        p.int = parseInt(document.getElementById('editPlayerInt').value) || 0;
+        p.sacks = parseInt(document.getElementById('editPlayerSacks').value) || 0;
+        saveData();
+        closeAdminModal();
+      }
+    }
+
+    function renderStats() {
+      const container = document.getElementById('playerStatsTableBody');
+      const sorted = [...appData.players].sort((a, b) => (b[currentStatSort] || 0) - (a[currentStatSort] || 0));
+
+      ['td', 'int', 'sacks'].forEach(cat => {
+        const btn = document.getElementById('stat-btn-' + cat);
+        if (btn) {
+          if (currentStatSort === cat) {
+            btn.className = 'stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-red text-white font-extrabold text-xs transition shadow';
+          } else {
+            btn.className = 'stat-sort-btn px-3.5 py-1.5 rounded-lg bg-espn-border text-gray-400 font-extrabold text-xs transition';
+          }
+        }
+      });
+
+      container.innerHTML = sorted.map(p => {
+        const team = appData.teams.find(t => t.id === p.teamId);
+        return `
+          <tr class="hover:bg-black/30">
+            <td class="p-3 font-extrabold text-white text-sm">
+              <div class="flex items-center gap-2">
+                <span class="text-espn-red font-mono text-xs">#${p.number}</span>
+                <span>${p.name}</span>
+              </div>
+              <span class="text-[10px] text-gray-400 font-semibold block">${team ? team.name : ''}</span>
+            </td>
+            <td class="p-3 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
+            <td class="p-3 text-center font-black text-espn-red text-base">${p.int || 0}</td>
+            <td class="p-3 text-center font-mono font-bold text-gray-200 text-base">${p.sacks || 0}</td>
+            ${isAdmin() ? `<td class="p-3 text-center"><button onclick="editPlayerModal('${p.id}')" class="bg-espn-red/20 text-espn-red hover:bg-espn-red hover:text-white px-2 py-1 rounded text-[11px] font-extrabold transition">Edit</button></td>` : ''}
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
     }
 
     function updatePlayerField(playerId, field, val) {
