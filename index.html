@@ -152,15 +152,18 @@
         <div class="lg:col-span-2 bg-espn-card rounded-2xl overflow-hidden border border-espn-border shadow-xl relative">
           <div class="h-64 sm:h-96 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=1200&q=80');">
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
-            <div class="absolute top-4 left-4 bg-espn-red text-white text-xs font-black px-3 py-1 uppercase rounded-md tracking-wider">
-              HEADLINE
+            <div class="absolute top-4 left-4 flex gap-2">
+              <span class="bg-espn-red text-white text-xs font-black px-3 py-1 uppercase rounded-md tracking-wider">HEADLINE</span>
+              <button id="adminEditHeadlineBtn" onclick="editHeadlineModal()" class="hidden bg-black/80 hover:bg-black text-espn-gold text-xs font-extrabold px-3 py-1 rounded-md border border-espn-gold/50 flex items-center gap-1 shadow">
+                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit Headline
+              </button>
             </div>
             <div class="absolute bottom-5 left-5 right-5">
-              <p class="text-espn-gold font-black text-xs sm:text-sm uppercase tracking-widest mb-1">Knee Bowl Season XVII</p>
-              <h2 class="text-xl sm:text-3xl font-display font-black text-white leading-tight mb-2">
+              <p id="dashHeadlineSubtitle" class="text-espn-gold font-black text-xs sm:text-sm uppercase tracking-widest mb-1">Knee Bowl Season XVII</p>
+              <h2 id="dashHeadlineTitle" class="text-xl sm:text-3xl font-display font-black text-white leading-tight mb-2">
                 Mud, Turf, and Glory: Knee Football League Ready for Kickoff
               </h2>
-              <p class="text-gray-300 text-xs sm:text-sm line-clamp-2">
+              <p id="dashHeadlineDesc" class="text-gray-300 text-xs sm:text-sm line-clamp-2">
                 Field 1 and Field 2 assignments are officially locked in for Sunday!
               </p>
             </div>
@@ -453,7 +456,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'backyard-ball-league';
     const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -471,6 +474,11 @@
     const ADMIN_EMAIL = 'hpillon77@gmail.com';
 
     const initialData = {
+      headline: {
+        subtitle: 'Knee Bowl Season XVII',
+        title: 'Mud, Turf, and Glory: Knee Football League Ready for Kickoff',
+        desc: 'Field 1 and Field 2 assignments are officially locked in for Sunday!'
+      },
       teams: [
         { id: 't1', name: 'Backyard Blitz', record: '4-1', color: '#CC0000', logo: '⚡' },
         { id: 't2', name: 'Grass Burners', record: '3-2', color: '#2b9348', logo: '🔥' },
@@ -547,11 +555,14 @@
 
         userId = auth.currentUser?.uid || crypto.randomUUID();
         
-        // STRICT CLOUD PATH SYNC
+        // STRICT PUBLIC CLOUD PATH
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
         onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             window.appData = docSnap.data();
+            if (!window.appData.headline) {
+              window.appData.headline = initialData.headline;
+            }
             localStorage.setItem('byb_local_league_cache', JSON.stringify(window.appData));
             renderAll();
           } else {
@@ -725,6 +736,11 @@
     }
 
     function renderDashboard() {
+      const hl = window.appData.headline || initialData.headline;
+      document.getElementById('dashHeadlineSubtitle').innerText = hl.subtitle;
+      document.getElementById('dashHeadlineTitle').innerText = hl.title;
+      document.getElementById('dashHeadlineDesc').innerText = hl.desc;
+
       const standingsBody = document.getElementById('dashStandingsBody');
       const sorted = [...window.appData.standings].sort((a, b) => (b.w / (b.w + b.l || 1)) - (a.w / (a.w + a.l || 1)));
       standingsBody.innerHTML = sorted.slice(0, 4).map(s => {
@@ -776,6 +792,40 @@
           <span class="font-black text-espn-red shrink-0">${p.int} INT</span>
         </div>
       `).join('');
+    }
+
+    window.editHeadlineModal = function() {
+      const hl = window.appData.headline || initialData.headline;
+      openAdminModal('general');
+      document.getElementById('adminModalContent').innerHTML = `
+        <h3 class="font-display font-black text-lg text-white mb-3">EDIT DASHBOARD HEADLINE</h3>
+        <form onsubmit="saveHeadline(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Subtitle (e.g. Knee Bowl Season XVII)</label>
+            <input type="text" id="admHlSub" value="${hl.subtitle}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Headline Title</label>
+            <input type="text" id="admHlTitle" value="${hl.title}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Description / Summary</label>
+            <textarea id="admHlDesc" rows="3" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required>${hl.desc}</textarea>
+          </div>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl shadow">Save Headline</button>
+        </form>
+      `;
+    }
+
+    window.saveHeadline = function(e) {
+      e.preventDefault();
+      window.appData.headline = {
+        subtitle: document.getElementById('admHlSub').value.trim(),
+        title: document.getElementById('admHlTitle').value.trim(),
+        desc: document.getElementById('admHlDesc').value.trim()
+      };
+      saveData();
+      closeAdminModal();
     }
 
     function renderSchedule() {
@@ -1177,6 +1227,7 @@
         content.innerHTML = `
           <h3 class="font-display font-black text-lg text-white mb-3">ADD CONTENT</h3>
           <div class="space-y-2.5 text-xs">
+            <button onclick="editHeadlineModal();" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-espn-gold">Edit Dashboard Headline</button>
             <button onclick="openAdminModal('addGame');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Game</button>
             <button onclick="openAdminModal('addPlayer');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Player to Team</button>
             <button onclick="openAdminModal('addNews');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Publish News Article</button>
