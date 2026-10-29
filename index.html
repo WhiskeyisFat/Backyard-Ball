@@ -54,25 +54,12 @@
       background: #444;
       border-radius: 4px;
     }
-    .ticker-scroll {
-      display: flex;
-      overflow-x: auto;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
-    }
   </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen bg-[#0d0d0d]">
 
-  <!-- TOP MARQUEE TICKER -->
-  <div class="bg-espn-black border-b border-espn-border sticky top-0 z-50">
-    <div id="tickerContent" class="ticker-scroll custom-scrollbar flex items-center space-x-6 px-4 py-1.5 w-full text-gray-200 text-sm font-semibold">
-      <!-- Dynamic Ticker Games Rendered via JS -->
-    </div>
-  </div>
-
-  <!-- MAIN HEADER / NAVIGATION -->
-  <header class="bg-espn-black border-b border-espn-border shadow-md sticky top-12 z-40">
+  <!-- MAIN HEADER / NAVIGATION AT VERY TOP -->
+  <header class="bg-espn-black border-b border-espn-border shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 sm:h-20">
         
@@ -622,7 +609,6 @@
     };
 
     function renderAll() {
-      renderTicker();
       renderUserHeader();
       renderAdminElements();
       renderDashboard();
@@ -634,23 +620,6 @@
       renderNews();
       renderChat();
       renderHof();
-    }
-    
-    function renderTicker() {
-      const ticker = document.getElementById('tickerContent');
-      ticker.innerHTML = appData.games.map(g => {
-        const home = appData.teams.find(t => t.id === g.homeId);
-        const away = appData.teams.find(t => t.id === g.awayId);
-        return `
-          <div class="flex items-center space-x-2 border-r border-espn-border pr-5 shrink-0">
-            <span class="font-extrabold text-white text-base">${away ? away.name : 'TBD'}</span>
-            <span class="font-mono text-espn-gold font-bold text-base">${g.status === 'UPCOMING' ? 'VS' : g.awayScore}</span>
-            <span class="text-gray-500 font-bold">@</span>
-            <span class="font-extrabold text-white text-base">${home ? home.name : 'TBD'}</span>
-            <span class="font-mono text-espn-gold font-bold text-base">${g.status === 'UPCOMING' ? 'VS' : g.homeScore}</span>
-          </div>
-        `;
-      }).join('');
     }
 
     function switchTab(tabId) {
