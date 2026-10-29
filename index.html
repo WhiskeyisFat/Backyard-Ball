@@ -446,11 +446,11 @@
       <form onsubmit="handleUserAuth(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Your Name</label>
-          <input type="text" id="authUsername" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. Cristiano Antunes">
+          <input type="text" id="authUsername" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="Cristiano Antunes">
         </div>
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Email Address</label>
-          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. user@gmail.com">
+          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="user@gmail.com">
         </div>
         <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow">Sign In / Register</button>
       </form>
@@ -664,13 +664,12 @@
       const email = document.getElementById('authEmail').value.trim().toLowerCase();
       if (!username || !email) return;
 
-      // Check if user already exists in DB
       let usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '{}');
       let user = usersDb[email];
       if (!user) {
         user = { name: username, email: email, authenticated: true };
       } else {
-        user.name = username; // update name if changed
+        user.name = username;
       }
 
       saveUserSession(user);
@@ -761,7 +760,10 @@
           <div class="bg-espn-card border border-espn-border rounded-2xl p-4 shadow-xl">
             <div class="flex justify-between items-center text-xs text-gray-400 mb-2 pb-2 border-b border-espn-border">
               <span class="font-black text-espn-gold">${g.field}</span>
-              <span class="font-bold">${g.date}</span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold">${g.date}</span>
+                ${isAdmin() ? `<button onclick="editGameScore('${g.id}')" class="bg-espn-red/20 text-espn-red hover:bg-espn-red hover:text-white px-2 py-0.5 rounded text-[11px] font-extrabold transition flex items-center gap-1"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
+              </div>
             </div>
             <div class="space-y-2">
               <div class="flex items-center justify-between">
@@ -781,11 +783,11 @@
             </div>
             <div class="mt-3 pt-2 border-t border-espn-border flex justify-between items-center">
               <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded ${g.status === 'LIVE' ? 'bg-espn-red text-white animate-pulse' : 'bg-black text-gray-400'}">${g.status}</span>
-              ${isAdmin() ? `<button onclick="editGameScore('${g.id}')" class="text-xs text-espn-red font-extrabold hover:underline">Edit Score</button>` : ''}
             </div>
           </div>
         `;
       }).join('');
+      lucide.createIcons();
     }
 
     function renderStandings() {
@@ -1236,10 +1238,28 @@
       if (!g) return;
       openAdminModal('general');
       document.getElementById('adminModalContent').innerHTML = `
-        <h3 class="font-display font-black text-lg text-white mb-3">UPDATE SCORE</h3>
-        <form onsubmit="saveGameScore(event, '${g.id}')" class="space-y-3 text-xs">
-          <div><label class="block font-bold text-gray-300 mb-1">Away Score</label><input type="number" id="editAway" value="${g.awayScore}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
-          <div><label class="block font-bold text-gray-300 mb-1">Home Score</label><input type="number" id="editHome" value="${g.homeScore}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+        <h3 class="font-display font-black text-lg text-white mb-3">EDIT GAME</h3>
+        <form onsubmit="saveGameFull(event, '${g.id}')" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Away Team</label>
+            <select id="editAwayTeam" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
+              ${appData.teams.map(t => `<option value="${t.id}" ${t.id === g.awayId ? 'selected' : ''}>${t.name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">Home Team</label>
+            <select id="editHomeTeam" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
+              ${appData.teams.map(t => `<option value="${t.id}" ${t.id === g.homeId ? 'selected' : ''}>${t.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-bold text-gray-300 mb-1">Away Score</label><input type="number" id="editAway" value="${g.awayScore}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+            <div><label class="block font-bold text-gray-300 mb-1">Home Score</label><input type="number" id="editHome" value="${g.homeScore}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-bold text-gray-300 mb-1">Field</label><input type="text" id="editField" value="${g.field}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+            <div><label class="block font-bold text-gray-300 mb-1">Date</label><input type="text" id="editDate" value="${g.date}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
+          </div>
           <div>
             <label class="block font-bold text-gray-300 mb-1">Status</label>
             <select id="editStatus" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white">
@@ -1248,17 +1268,21 @@
               <option value="FINAL" ${g.status==='FINAL'?'selected':''}>FINAL</option>
             </select>
           </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl">Save Score</button>
+          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl shadow">Save Game Details</button>
         </form>
       `;
     }
 
-    function saveGameScore(e, id) {
+    function saveGameFull(e, id) {
       e.preventDefault();
       const g = appData.games.find(x => x.id === id);
       if (g) {
+        g.awayId = document.getElementById('editAwayTeam').value;
+        g.homeId = document.getElementById('editHomeTeam').value;
         g.awayScore = parseInt(document.getElementById('editAway').value) || 0;
         g.homeScore = parseInt(document.getElementById('editHome').value) || 0;
+        g.field = document.getElementById('editField').value.trim();
+        g.date = document.getElementById('editDate').value.trim();
         g.status = document.getElementById('editStatus').value;
         saveData();
         closeAdminModal();
