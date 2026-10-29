@@ -54,6 +54,12 @@
       background: #444;
       border-radius: 4px;
     }
+    [contenteditable="true"] {
+      outline: 2px dashed #CC0000;
+      padding: 2px 4px;
+      border-radius: 4px;
+      background: rgba(204, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen bg-[#0d0d0d]">
@@ -92,7 +98,7 @@
           <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition flex items-center gap-1">
             <i data-lucide="message-square" class="w-4 h-4"></i> Chat
           </button>
-          <button onclick="switchTab('hof')" id="nav-hof" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition text-espn-gold flex items-center gap-1">
+          <button onclick="switchTab('hof')" id="nav-hof" class="nav-btn px-3 py-2 rounded-lg hover:text-white hover:bg-espn-card transition flex items-center gap-1">
             <i data-lucide="award" class="w-4 h-4"></i> HOF
           </button>
         </nav>
@@ -119,8 +125,8 @@
       <button onclick="switchTab('stats')" id="m-nav-stats" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-gray-300 shrink-0 border border-espn-border">Stats</button>
       <button onclick="switchTab('playoffs')" id="m-nav-playoffs" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-gray-300 shrink-0 border border-espn-border">Playoffs</button>
       <button onclick="switchTab('news')" id="m-nav-news" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-gray-300 shrink-0 border border-espn-border">News</button>
-      <button onclick="switchTab('chat')" id="m-nav-chat" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-espn-red shrink-0 border border-espn-border">Chat</button>
-      <button onclick="switchTab('hof')" id="m-nav-hof" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-espn-gold shrink-0 border border-espn-border">HOF</button>
+      <button onclick="switchTab('chat')" id="m-nav-chat" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-gray-300 shrink-0 border border-espn-border">Chat</button>
+      <button onclick="switchTab('hof')" id="m-nav-hof" class="m-nav-btn px-4 py-2.5 rounded-xl bg-black text-gray-300 shrink-0 border border-espn-border">HOF</button>
     </div>
 
     <!-- FULL MOBILE MENU DROPDOWN -->
@@ -132,8 +138,8 @@
       <button onclick="switchTab('stats'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card">Player Stats</button>
       <button onclick="switchTab('playoffs'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card">Playoffs</button>
       <button onclick="switchTab('news'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card">News & Rankings</button>
-      <button onclick="switchTab('chat'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card text-espn-red">Chat Room</button>
-      <button onclick="switchTab('hof'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card text-espn-gold">Hall of Fame</button>
+      <button onclick="switchTab('chat'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card">Chat Room</button>
+      <button onclick="switchTab('hof'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-xl hover:bg-espn-card">Hall of Fame</button>
     </div>
   </header>
 
@@ -144,8 +150,11 @@
       <span class="text-xs sm:text-sm">Logged in as hpillon77@gmail.com</span>
     </div>
     <div class="flex items-center gap-2 w-full sm:w-auto">
-      <button onclick="openAdminModal('general')" class="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-200 transition shadow flex-grow sm:flex-grow-0 text-center">
-        <i data-lucide="settings" class="w-4 h-4 inline mr-1"></i> Admin Menu
+      <button onclick="toggleInlineEditMode()" id="inlineEditToggleBtn" class="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-200 transition shadow flex-grow sm:flex-grow-0 text-center">
+        <i data-lucide="edit-3" class="w-4 h-4 inline mr-1"></i> Enable Quick Inline Edit
+      </button>
+      <button onclick="openAdminModal('general')" class="bg-black text-white border border-white/30 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-900 transition shadow">
+        + Add Content
       </button>
     </div>
   </div>
@@ -317,9 +326,9 @@
             <thead class="bg-black text-gray-400 text-xs uppercase tracking-wider font-extrabold border-b border-espn-border">
               <tr>
                 <th class="p-3.5">Player</th>
-                <th class="p-3.5 text-center text-espn-gold">TD</th>
-                <th class="p-3.5 text-center text-espn-red">INT</th>
-                <th class="p-3.5 text-center text-gray-300">Sacks</th>
+                <th class="p-3.5 text-center">TD</th>
+                <th class="p-3.5 text-center">INT</th>
+                <th class="p-3.5 text-center">Sacks</th>
               </tr>
             </thead>
             <tbody id="playerStatsTableBody" class="divide-y divide-espn-border"></tbody>
@@ -417,7 +426,7 @@
       </div>
 
       <div class="flex space-x-2 border-b border-espn-border pb-3 overflow-x-auto text-xs sm:text-sm">
-        <button onclick="filterHof('all')" id="hof-filter-all" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-gold text-black shrink-0 transition">All</button>
+        <button onclick="filterHof('all')" id="hof-filter-all" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">All</button>
         <button onclick="filterHof('player')" id="hof-filter-player" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Players</button>
         <button onclick="filterHof('team')" id="hof-filter-team" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Teams</button>
         <button onclick="filterHof('award')" id="hof-filter-award" class="hof-filter-btn px-4 py-2 rounded-full font-extrabold bg-espn-card text-gray-400 shrink-0 transition">Awards</button>
@@ -432,21 +441,18 @@
   <div id="authModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-espn-card border border-espn-border rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-      <h3 class="font-display font-black text-xl text-white mb-1">SIGN IN / JOIN</h3>
-      <form onsubmit="handleUserAuth(event)" class="space-y-4 mt-4">
+      <h3 class="font-display font-black text-xl text-white mb-1">SIGN IN OR CREATE ACCOUNT</h3>
+      <p class="text-xs text-gray-400 mb-4">Enter your email and name to sign in or register your account.</p>
+      <form onsubmit="handleUserAuth(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Your Name</label>
-          <input type="text" id="authUsername" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. Hunter Pillon">
+          <input type="text" id="authUsername" value="Cristiano Antunes" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. Cristiano Antunes">
         </div>
         <div>
           <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Email Address</label>
-          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. hpillon77@gmail.com">
+          <input type="email" id="authEmail" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="e.g. user@gmail.com">
         </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-gray-300 mb-1">Password</label>
-          <input type="password" id="authPassword" class="w-full bg-black border border-espn-border rounded-xl p-3 text-sm text-white focus:outline-none focus:border-espn-red" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow">Sign In</button>
+        <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl text-sm transition uppercase tracking-wider shadow">Sign In / Register</button>
       </form>
     </div>
   </div>
@@ -460,8 +466,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'byb_knee_football_data_v2';
-    const USER_KEY = 'byb_current_user_v2';
+    const STORAGE_KEY = 'byb_knee_football_data_v3';
+    const USERS_DB_KEY = 'byb_registered_users_db';
+    const CURRENT_USER_KEY = 'byb_active_user_session';
     const ADMIN_EMAIL = 'hpillon77@gmail.com';
 
     const initialData = {
@@ -521,11 +528,12 @@
     };
 
     let appData = loadData();
-    let currentUser = loadUser();
+    let currentUser = loadUserSession();
     let currentTab = 'dashboard';
     let currentStatSort = 'td';
     let currentHofFilter = 'all';
     let selectedTeamId = 't1';
+    let inlineEditActive = false;
 
     function loadData() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -537,14 +545,20 @@
       renderAll();
     }
 
-    function loadUser() {
-      const saved = localStorage.getItem(USER_KEY);
+    function loadUserSession() {
+      const saved = localStorage.getItem(CURRENT_USER_KEY);
       return saved ? JSON.parse(saved) : null;
     }
 
-    function saveUser(user) {
+    function saveUserSession(user) {
       currentUser = user;
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      
+      // Also store in registered users DB
+      let usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '{}');
+      usersDb[user.email.toLowerCase()] = user;
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));
+
       renderUserHeader();
       renderAdminElements();
       renderChat();
@@ -579,9 +593,17 @@
       const target = document.getElementById('tab-' + tabId);
       if (target) target.classList.remove('hidden');
 
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-espn-red', 'bg-espn-card'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-espn-red', 'bg-espn-card', 'text-espn-gold');
+      });
       const activeNav = document.getElementById('nav-' + tabId);
-      if (activeNav) activeNav.classList.add('text-espn-red', 'bg-espn-card');
+      if (activeNav) {
+        if (tabId === 'hof') {
+          activeNav.classList.add('text-espn-gold', 'bg-espn-card');
+        } else {
+          activeNav.classList.add('text-espn-red', 'bg-espn-card');
+        }
+      }
 
       document.querySelectorAll('.m-nav-btn').forEach(btn => {
         btn.classList.remove('bg-espn-card', 'text-white', 'text-espn-red', 'text-espn-gold');
@@ -605,7 +627,7 @@
       if (currentUser) {
         const isCommish = isAdmin();
         container.innerHTML = `
-          <button onclick="logoutUser()" class="flex items-center gap-2 bg-black px-3 py-1.5 rounded-full border border-espn-border text-sm">
+          <button onclick="logoutUser()" class="flex items-center gap-2 bg-black px-3 py-1.5 rounded-full border border-espn-border text-sm" title="Click to log out">
             <span class="w-6 h-6 rounded-full ${isCommish ? 'bg-espn-red' : 'bg-gray-700'} flex items-center justify-center font-black text-xs text-white">
               ${currentUser.name.charAt(0).toUpperCase()}
             </span>
@@ -629,6 +651,7 @@
       } else {
         adminBar.classList.add('hidden');
         document.querySelectorAll('[id^="admin"]').forEach(el => el.classList.add('hidden'));
+        inlineEditActive = false;
       }
     }
 
@@ -638,16 +661,41 @@
     function handleUserAuth(e) {
       e.preventDefault();
       const username = document.getElementById('authUsername').value.trim();
-      const email = document.getElementById('authEmail').value.trim();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
       if (!username || !email) return;
-      saveUser({ name: username, email: email, authenticated: true });
+
+      // Check if user already exists in DB
+      let usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '{}');
+      let user = usersDb[email];
+      if (!user) {
+        user = { name: username, email: email, authenticated: true };
+      } else {
+        user.name = username; // update name if changed
+      }
+
+      saveUserSession(user);
       closeAuthModal();
     }
 
     function logoutUser() {
-      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(CURRENT_USER_KEY);
       currentUser = null;
       renderAll();
+    }
+
+    function toggleInlineEditMode() {
+      inlineEditActive = !inlineEditActive;
+      const btn = document.getElementById('inlineEditToggleBtn');
+      if (inlineEditActive) {
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 inline mr-1"></i> Exit Quick Edit`;
+        btn.className = 'bg-espn-gold text-black px-3 py-1.5 rounded-lg text-xs font-black transition shadow flex-grow sm:flex-grow-0 text-center';
+      } else {
+        btn.innerHTML = `<i data-lucide="edit-3" class="w-4 h-4 inline mr-1"></i> Enable Quick Inline Edit`;
+        btn.className = 'bg-white text-black px-3 py-1.5 rounded-lg text-xs font-black transition shadow flex-grow sm:flex-grow-0 text-center';
+      }
+      renderTeams();
+      renderStandings();
+      renderStats();
     }
 
     function renderDashboard() {
@@ -748,23 +796,37 @@
         const total = s.w + s.l + s.t;
         const pct = total > 0 ? (s.w / total).toFixed(3).replace('0.', '.') : '.000';
         const diff = s.pf - s.pa;
+        const editable = (isAdmin() && inlineEditActive);
         return `
           <tr class="hover:bg-black/30">
             <td class="p-3 font-extrabold text-white flex items-center gap-2 text-sm">
               <span class="text-espn-gold font-black text-xs w-4">${idx + 1}</span>
               <span class="text-lg">${team ? team.logo : ''}</span>
-              <span>${team ? team.name : ''}</span>
+              <span ${editable ? `contenteditable="true" onblur="updateStandingField('${s.teamId}', 'name', this.innerText)"` : ''}>${team ? team.name : ''}</span>
             </td>
-            <td class="p-3 text-center font-bold text-white text-sm">${s.w}</td>
-            <td class="p-3 text-center font-bold text-white text-sm">${s.l}</td>
-            <td class="p-3 text-center font-bold text-white text-sm">${s.t}</td>
+            <td class="p-3 text-center font-bold text-white text-sm" ${editable ? `contenteditable="true" onblur="updateStandingField('${s.teamId}', 'w', this.innerText)"` : ''}>${s.w}</td>
+            <td class="p-3 text-center font-bold text-white text-sm" ${editable ? `contenteditable="true" onblur="updateStandingField('${s.teamId}', 'l', this.innerText)"` : ''}>${s.l}</td>
+            <td class="p-3 text-center font-bold text-white text-sm" ${editable ? `contenteditable="true" onblur="updateStandingField('${s.teamId}', 't', this.innerText)"` : ''}>${s.t}</td>
             <td class="p-3 text-center font-black text-espn-gold text-sm">${pct}</td>
-            <td class="p-3 text-center font-mono text-gray-300 text-sm">${s.pf}</td>
-            <td class="p-3 text-center font-mono text-gray-300 text-sm">${s.pa}</td>
+            <td class="p-3 text-center font-mono text-gray-300 text-sm" ${editable ? `contenteditable="true" onblur="updateStandingField('${s.teamId}', 'pf', this.innerText)"` : ''}>${s.pf}</td>
+            <td class="p-3 text-center font-mono text-gray-300 text-sm" ${editable ? `contenteditable="true" onblur="updateStandingField('${s.teamId}', 'pa', this.innerText)"` : ''}>${s.pa}</td>
             <td class="p-3 text-center font-mono font-bold text-sm ${diff >= 0 ? 'text-green-400' : 'text-red-400'}">${diff > 0 ? '+' + diff : diff}</td>
           </tr>
         `;
       }).join('');
+    }
+
+    function updateStandingField(teamId, field, val) {
+      if (field === 'name') {
+        const t = appData.teams.find(x => x.id === teamId);
+        if (t) t.name = val.trim();
+      } else {
+        const s = appData.standings.find(x => x.teamId === teamId);
+        if (s) {
+          s[field] = parseInt(val) || 0;
+        }
+      }
+      saveData();
     }
 
     function renderTeams() {
@@ -778,6 +840,7 @@
 
       const activeTeam = appData.teams.find(t => t.id === selectedTeamId) || appData.teams[0];
       const teamPlayers = appData.players.filter(p => p.teamId === activeTeam.id);
+      const editable = (isAdmin() && inlineEditActive);
 
       const view = document.getElementById('activeTeamView');
       view.innerHTML = `
@@ -789,12 +852,12 @@
               <p class="text-xs text-espn-gold font-extrabold mt-0.5">RECORD: ${activeTeam.record}</p>
             </div>
           </div>
-          ${isAdmin() ? `<button onclick="editTeam('${activeTeam.id}')" class="bg-black border border-espn-border text-xs text-gray-300 px-3 py-1.5 rounded-lg font-bold">Edit Team</button>` : ''}
+          ${editable ? '<span class="text-xs text-espn-gold font-bold bg-black/60 px-3 py-1 rounded-lg border border-espn-gold/40">Quick Inline Edit Active</span>' : ''}
         </div>
 
         <div class="bg-espn-card rounded-2xl border border-espn-border overflow-hidden shadow-xl">
-          <div class="p-3 bg-black/60 border-b border-espn-border font-extrabold text-[11px] uppercase text-gray-400 tracking-wider">
-            Active Roster
+          <div class="p-3 bg-black/60 border-b border-espn-border font-extrabold text-[11px] uppercase text-gray-400 tracking-wider flex justify-between items-center">
+            <span>Active Roster ${editable ? '(Click any cell to edit)' : ''}</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
@@ -806,19 +869,17 @@
                   <th class="p-2.5 text-center w-12">TD</th>
                   <th class="p-2.5 text-center w-12">INT</th>
                   <th class="p-2.5 text-center w-14">Sacks</th>
-                  ${isAdmin() ? '<th class="p-2.5 text-center w-16">Action</th>' : ''}
                 </tr>
               </thead>
               <tbody class="divide-y divide-espn-border">
                 ${teamPlayers.map(p => `
                   <tr>
-                    <td class="p-2.5 font-mono font-bold text-espn-red">#${p.number}</td>
-                    <td class="p-2.5 font-extrabold text-white truncate max-w-[110px]">${p.name}</td>
-                    <td class="p-2.5 text-[11px] text-gray-400 font-bold">${p.pos}</td>
-                    <td class="p-2.5 text-center font-black text-espn-gold">${p.td || 0}</td>
-                    <td class="p-2.5 text-center font-black text-espn-red">${p.int || 0}</td>
-                    <td class="p-2.5 text-center font-mono font-bold text-gray-200">${p.sacks || 0}</td>
-                    ${isAdmin() ? `<td class="p-2.5 text-center"><button onclick="editPlayer('${p.id}')" class="text-espn-red font-bold text-xs">Edit</button></td>` : ''}
+                    <td class="p-2.5 font-mono font-bold text-espn-red" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'number', this.innerText)"` : ''}>${p.number}</td>
+                    <td class="p-2.5 font-extrabold text-white" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'name', this.innerText)"` : ''}>${p.name}</td>
+                    <td class="p-2.5 text-[11px] text-gray-400 font-bold" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'pos', this.innerText)"` : ''}>${p.pos}</td>
+                    <td class="p-2.5 text-center font-black text-espn-gold" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'td', this.innerText)"` : ''}>${p.td || 0}</td>
+                    <td class="p-2.5 text-center font-black text-espn-red" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'int', this.innerText)"` : ''}>${p.int || 0}</td>
+                    <td class="p-2.5 text-center font-mono font-bold text-gray-200" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'sacks', this.innerText)"` : ''}>${p.sacks || 0}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -826,6 +887,17 @@
           </div>
         </div>
       `;
+    }
+
+    function updatePlayerField(playerId, field, val) {
+      const p = appData.players.find(x => x.id === playerId);
+      if (!p) return;
+      if (['td', 'int', 'sacks'].includes(field)) {
+        p[field] = parseInt(val) || 0;
+      } else {
+        p[field] = val.trim();
+      }
+      saveData();
     }
 
     function selectTeam(teamId) {
@@ -848,20 +920,22 @@
         }
       });
 
+      const editable = (isAdmin() && inlineEditActive);
+
       container.innerHTML = sorted.map(p => {
         const team = appData.teams.find(t => t.id === p.teamId);
         return `
           <tr class="hover:bg-black/30">
             <td class="p-3 font-extrabold text-white text-sm">
               <div class="flex items-center gap-2">
-                <span class="text-espn-red font-mono text-xs">#${p.number}</span>
-                <span>${p.name}</span>
+                <span class="text-espn-red font-mono text-xs" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'number', this.innerText)"` : ''}>#${p.number}</span>
+                <span ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'name', this.innerText)"` : ''}>${p.name}</span>
               </div>
               <span class="text-[10px] text-gray-400 font-semibold block">${team ? team.name : ''}</span>
             </td>
-            <td class="p-3 text-center font-black text-espn-gold text-base">${p.td || 0}</td>
-            <td class="p-3 text-center font-black text-espn-red text-base">${p.int || 0}</td>
-            <td class="p-3 text-center font-mono font-bold text-gray-200 text-base">${p.sacks || 0}</td>
+            <td class="p-3 text-center font-black text-espn-gold text-base" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'td', this.innerText)"` : ''}>${p.td || 0}</td>
+            <td class="p-3 text-center font-black text-espn-red text-base" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'int', this.innerText)"` : ''}>${p.int || 0}</td>
+            <td class="p-3 text-center font-mono font-bold text-gray-200 text-base" ${editable ? `contenteditable="true" onblur="updatePlayerField('${p.id}', 'sacks', this.innerText)"` : ''}>${p.sacks || 0}</td>
           </tr>
         `;
       }).join('');
@@ -1020,13 +1094,13 @@
 
       if (action === 'general') {
         content.innerHTML = `
-          <h3 class="font-display font-black text-lg text-white mb-3">COMMISSIONER CONTROLS</h3>
+          <h3 class="font-display font-black text-lg text-white mb-3">ADD CONTENT</h3>
           <div class="space-y-2.5 text-xs">
-            <button onclick="openAdminModal('addGame'); closeAdminModal(); openAdminModal('addGame');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Game</button>
-            <button onclick="openAdminModal('addPlayer'); closeAdminModal(); openAdminModal('addPlayer');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Player to Team</button>
-            <button onclick="openAdminModal('addNews'); closeAdminModal(); openAdminModal('addNews');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Publish News Article</button>
-            <button onclick="openAdminModal('addHof'); closeAdminModal(); openAdminModal('addHof');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-espn-gold">+ Add Hall of Fame Entry</button>
-            <button onclick="openAdminModal('editPlayoffs'); closeAdminModal(); openAdminModal('editPlayoffs');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">Update Playoff Bracket</button>
+            <button onclick="openAdminModal('addGame');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Game</button>
+            <button onclick="openAdminModal('addPlayer');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Add Player to Team</button>
+            <button onclick="openAdminModal('addNews');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">+ Publish News Article</button>
+            <button onclick="openAdminModal('addHof');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-espn-gold">+ Add Hall of Fame Entry</button>
+            <button onclick="openAdminModal('editPlayoffs');" class="w-full bg-espn-card border border-espn-border p-3 rounded-xl font-extrabold text-left hover:bg-black transition text-white">Update Playoff Champion</button>
           </div>
         `;
       } else if (action === 'addGame') {
@@ -1186,43 +1260,6 @@
         g.awayScore = parseInt(document.getElementById('editAway').value) || 0;
         g.homeScore = parseInt(document.getElementById('editHome').value) || 0;
         g.status = document.getElementById('editStatus').value;
-        saveData();
-        closeAdminModal();
-      }
-    }
-
-    function editPlayer(playerId) {
-      const p = appData.players.find(x => x.id === playerId);
-      if (!p) return;
-      openAdminModal('general');
-      document.getElementById('adminModalContent').innerHTML = `
-        <h3 class="font-display font-black text-lg text-white mb-3">EDIT PLAYER STATS</h3>
-        <form onsubmit="savePlayerStats(event, '${p.id}')" class="space-y-3 text-xs">
-          <div><label class="block font-bold text-gray-300 mb-1">Player Name</label><input type="text" id="editPName" value="${p.name}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
-          <div class="grid grid-cols-2 gap-2">
-            <div><label class="block font-bold text-gray-300 mb-1">#</label><input type="text" id="editPNum" value="${p.number}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
-            <div><label class="block font-bold text-gray-300 mb-1">Pos</label><input type="text" id="editPPos" value="${p.pos}" class="w-full bg-black border border-espn-border p-2.5 rounded-xl text-white" required></div>
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            <div><label class="block text-gray-400 mb-1">TD</label><input type="number" id="editPTd" value="${p.td || 0}" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
-            <div><label class="block text-gray-400 mb-1">INT</label><input type="number" id="editPInt" value="${p.int || 0}" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
-            <div><label class="block text-gray-400 mb-1">Sacks</label><input type="number" id="editPSacks" value="${p.sacks || 0}" class="w-full bg-black border border-espn-border p-2 rounded-xl text-white"></div>
-          </div>
-          <button type="submit" class="w-full bg-espn-red text-white font-extrabold py-3 rounded-xl mt-2">Save Player</button>
-        </form>
-      `;
-    }
-
-    function savePlayerStats(e, id) {
-      e.preventDefault();
-      const p = appData.players.find(x => x.id === id);
-      if (p) {
-        p.name = document.getElementById('editPName').value;
-        p.number = document.getElementById('editPNum').value;
-        p.pos = document.getElementById('editPPos').value;
-        p.td = parseInt(document.getElementById('editPTd').value) || 0;
-        p.int = parseInt(document.getElementById('editPInt').value) || 0;
-        p.sacks = parseInt(document.getElementById('editPSacks').value) || 0;
         saveData();
         closeAdminModal();
       }
