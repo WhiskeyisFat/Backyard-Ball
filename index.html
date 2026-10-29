@@ -453,7 +453,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'backyard-ball-league';
     const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -547,7 +547,7 @@
 
         userId = auth.currentUser?.uid || crypto.randomUUID();
         
-        // REAL-TIME CLOUD SYNC LISTENER
+        // STRICT CLOUD PATH SYNC
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'league_state');
         onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
@@ -558,7 +558,7 @@
             setDoc(docRef, initialData).catch(() => {});
           }
         }, (err) => {
-          console.warn("Firestore sync fallback to local cache:", err);
+          console.warn("Firestore listener error:", err);
           const cached = localStorage.getItem('byb_local_league_cache');
           if (cached) {
             window.appData = JSON.parse(cached);
@@ -567,7 +567,7 @@
         });
 
       } catch (e) {
-        console.warn("Offline or demo mode active:", e);
+        console.warn("Firebase auth/init fallback:", e);
         const cached = localStorage.getItem('byb_local_league_cache');
         window.appData = cached ? JSON.parse(cached) : initialData;
         renderAll();
